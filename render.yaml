@@ -1,0 +1,15 @@
+# Render.com Blueprint — Nanocer QR render service (stateless image generation).
+# Redirects do NOT run here (they live on Vercel to avoid free-tier cold starts).
+services:
+  - type: web
+    name: nanocer-render
+    runtime: python
+    plan: free
+    rootDir: server
+    branch: main
+    autoDeploy: true
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ALLOWED_ORIGIN
+        sync: false   # set to your Vercel URL in the Render dashboard
