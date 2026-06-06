@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: nanocer-qr-redirect
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements-server.txt
+    startCommand: uvicorn server_asgi:app --host 0.0.0.0 --port $PORT
+    autoDeploy: true
+    branch: main
+    envVars:
+      - key: QRGEN_PUBLIC_BASE_URL
+        value: "https://<your-domain>"  # replace with your Nanocer domain
