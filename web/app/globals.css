@@ -48,6 +48,18 @@ body {
   }
 }
 
+/* PP Frama renders much heavier and tighter than Geist did at the same weight
+ * classes (it only ships Regular and Black, so font-bold fell back to Black).
+ * Pin the display face to Regular and loosen the tracking. Written unlayered
+ * so it wins over Tailwind's layered font-weight/tracking utilities. */
+h1,
+h2,
+h3,
+.font-display {
+  font-weight: 400;
+  letter-spacing: 0.015em;
+}
+
 @layer components {
   /* Brand surfaces ------------------------------------------------- */
   .brand-gradient {
