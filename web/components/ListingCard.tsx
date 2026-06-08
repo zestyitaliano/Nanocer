@@ -4,7 +4,7 @@ import { STATUS_LABEL, type Listing, type ListingStatus } from "@/lib/types";
 
 export const STATUS_COLOR: Record<ListingStatus, string> = {
   coming_soon: "bg-amber-100 text-amber-700",
-  active: "bg-green-100 text-green-700",
+  active: "bg-emerald-100 text-emerald-700",
   under_contract: "bg-blue-100 text-blue-700",
   sold: "bg-neutral-200 text-neutral-600",
   other: "bg-neutral-100 text-neutral-500",
@@ -33,23 +33,21 @@ export default function ListingCard({
   return (
     <button
       onClick={onOpen}
-      className="text-left bg-white border rounded-xl p-4 hover:shadow-md transition flex flex-col gap-2"
+      className="card card-hover text-left p-5 flex flex-col gap-2.5 cursor-pointer"
     >
       <div className="flex items-start justify-between gap-2">
-        <span className="font-medium text-sm truncate">{label}</span>
-        <span
-          className={`shrink-0 text-[11px] px-1.5 py-0.5 rounded ${STATUS_COLOR[listing.status]}`}
-        >
+        <span className="font-semibold text-sm truncate">{label}</span>
+        <span className={`chip shrink-0 ${STATUS_COLOR[listing.status]}`}>
           {STATUS_LABEL[listing.status]}
         </span>
       </div>
       {listing.name && listing.address && (
-        <span className="text-xs text-neutral-500 truncate">{listing.address}</span>
+        <span className="text-xs text-[var(--muted)] truncate">{listing.address}</span>
       )}
-      <span className="text-xs text-neutral-500">{facts || "—"}</span>
-      <div className="mt-1 flex gap-3 text-[11px] text-neutral-400">
-        <span>▣ {codeCount} codes</span>
-        <span>📈 {scanSum} scans</span>
+      <span className="text-sm text-[var(--ink)] font-medium">{facts || "—"}</span>
+      <div className="mt-2 pt-3 border-t border-[var(--border)] flex gap-4 text-[11px] text-[var(--muted)]">
+        <span className="flex items-center gap-1">▣ {codeCount} codes</span>
+        <span className="flex items-center gap-1">📈 {scanSum} scans</span>
       </div>
     </button>
   );

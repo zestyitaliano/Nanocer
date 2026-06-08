@@ -118,7 +118,7 @@ function serialize(d: Draft): QuizConfig {
   };
 }
 
-const inputCls = "border rounded-lg px-2 py-1.5 text-sm";
+const inputCls = "input";
 
 export default function QuizEditor({
   initialQuiz,
@@ -167,16 +167,17 @@ export default function QuizEditor({
   }
 
   return (
-    <div className="border-t pt-3 space-y-3">
-      <label className="flex items-center gap-2 text-sm font-medium text-neutral-700">
+    <div className="border-t border-[var(--border)] pt-4 space-y-3">
+      <label className="flex items-center gap-2 text-sm font-semibold text-[var(--ink)]">
         <input
           type="checkbox"
           checked={draft.enabled}
           onChange={(e) => update({ ...draft, enabled: e.target.checked })}
+          className="accent-violet-600 w-4 h-4"
         />
         Floor-plan finder (questionnaire)
       </label>
-      <p className="text-xs text-neutral-500 -mt-1">
+      <p className="text-xs text-[var(--muted)] -mt-1">
         When on, the page shows a short quiz that recommends a plan based on the
         answers, then captures the lead. Needs at least one plan and one
         question to go live.
@@ -201,11 +202,11 @@ export default function QuizEditor({
 
           {/* Plans -------------------------------------------------------- */}
           <div className="space-y-2">
-            <span className="text-xs font-medium text-neutral-500">
+            <span className="text-xs font-semibold text-[var(--muted)]">
               Floor plans
             </span>
             {draft.plans.map((p, i) => (
-              <div key={p.id} className="border rounded-lg p-3 space-y-2 bg-neutral-50">
+              <div key={p.id} className="border border-[var(--border)] rounded-xl p-3 space-y-2 bg-neutral-50/70">
                 <div className="flex items-center gap-2">
                   <input
                     className={`${inputCls} flex-1`}
@@ -253,7 +254,7 @@ export default function QuizEditor({
                   onChange={(e) => patchPlan(p.id, { tags: e.target.value })}
                 />
                 <div className="flex items-center gap-2">
-                  <label className="text-xs text-neutral-500 flex items-center gap-2">
+                  <label className="text-xs text-[var(--muted)] flex items-center gap-2">
                     Photo:
                     <input
                       type="file"
@@ -320,7 +321,7 @@ export default function QuizEditor({
                   ],
                 })
               }
-              className="text-sm text-blue-600"
+              className="text-sm brand-text font-medium"
             >
               + Add floor plan
             </button>
@@ -328,11 +329,11 @@ export default function QuizEditor({
 
           {/* Questions ---------------------------------------------------- */}
           <div className="space-y-2">
-            <span className="text-xs font-medium text-neutral-500">
+            <span className="text-xs font-semibold text-[var(--muted)]">
               Questions
             </span>
             {draft.questions.map((q, qi) => (
-              <div key={q.id} className="border rounded-lg p-3 space-y-2 bg-neutral-50">
+              <div key={q.id} className="border border-[var(--border)] rounded-xl p-3 space-y-2 bg-neutral-50/70">
                 <div className="flex items-center gap-2">
                   <input
                     className={`${inputCls} flex-1`}
@@ -402,7 +403,7 @@ export default function QuizEditor({
                         ],
                       })
                     }
-                    className="text-xs text-blue-600"
+                    className="text-xs brand-text font-medium"
                   >
                     + Add answer
                   </button>
@@ -423,13 +424,13 @@ export default function QuizEditor({
                   ],
                 })
               }
-              className="text-sm text-blue-600"
+              className="text-sm brand-text font-medium"
             >
               + Add question
             </button>
           </div>
 
-          {busy && <p className="text-xs text-neutral-400">Uploading…</p>}
+          {busy && <p className="text-xs text-[var(--muted)]">Uploading…</p>}
         </>
       )}
     </div>

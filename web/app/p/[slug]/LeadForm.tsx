@@ -47,7 +47,7 @@ export default function LeadForm({
 
   if (done) {
     return (
-      <div className="rounded-xl border bg-green-50 text-green-800 p-4 text-sm text-center">
+      <div className="rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 p-4 text-sm text-center font-medium">
         Thanks! The agent will reach out shortly.
       </div>
     );
@@ -60,7 +60,7 @@ export default function LeadForm({
         placeholder="Your name"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        className="w-full border rounded-lg px-3 py-2 text-sm"
+        className="input w-full"
       />
       <input
         required
@@ -68,28 +68,28 @@ export default function LeadForm({
         placeholder="Phone"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
-        className="w-full border rounded-lg px-3 py-2 text-sm"
+        className="input w-full"
       />
       <input
         type="email"
         placeholder="Email (optional)"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full border rounded-lg px-3 py-2 text-sm"
+        className="input w-full"
       />
       <textarea
         placeholder="Message (optional)"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         rows={2}
-        className="w-full border rounded-lg px-3 py-2 text-sm"
+        className="input w-full"
       />
       {err && <p className="text-sm text-red-600">{err}</p>}
       <button
         type="submit"
         disabled={busy}
         style={{ background: accent }}
-        className="w-full text-white rounded-lg py-2.5 text-sm font-medium disabled:opacity-60"
+        className="w-full text-white rounded-xl py-3 text-sm font-semibold shadow-sm disabled:opacity-60 transition active:translate-y-px"
       >
         {busy ? busyLabel : label}
       </button>

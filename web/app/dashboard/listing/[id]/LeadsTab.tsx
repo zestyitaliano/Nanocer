@@ -56,50 +56,50 @@ export default function LeadsTab({ listingId }: { listingId: string }) {
     URL.revokeObjectURL(url);
   }
 
-  if (loading) return <div className="text-sm text-neutral-400">Loading leads…</div>;
+  if (loading) return <div className="text-sm text-[var(--muted)]">Loading leads…</div>;
 
   if (leads.length === 0) {
     return (
-      <div className="text-center text-neutral-400 text-sm py-16 border rounded-xl bg-white">
+      <div className="card text-center text-[var(--muted)] text-sm py-16">
         No leads yet. They appear here when someone submits the property page form.
       </div>
     );
   }
 
   return (
-    <div className="bg-white border rounded-xl overflow-hidden">
-      <div className="flex justify-between items-center px-4 py-2 border-b">
-        <span className="text-sm font-medium">{leads.length} leads</span>
-        <button onClick={exportCsv} className="text-sm text-blue-600">
+    <div className="card overflow-hidden">
+      <div className="flex justify-between items-center px-4 py-3 border-b border-[var(--border)]">
+        <span className="text-sm font-semibold">{leads.length} leads</span>
+        <button onClick={exportCsv} className="btn btn-secondary btn-sm">
           Export CSV
         </button>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 text-neutral-500 text-xs">
+          <thead className="bg-neutral-50 text-[var(--muted)] text-xs">
             <tr>
-              <th className="text-left px-3 py-2">Name</th>
-              <th className="text-left px-3 py-2">Phone</th>
-              <th className="text-left px-3 py-2">Email</th>
-              <th className="text-left px-3 py-2">Message</th>
-              <th className="text-left px-3 py-2">When</th>
+              <th className="text-left px-4 py-2.5 font-semibold">Name</th>
+              <th className="text-left px-4 py-2.5 font-semibold">Phone</th>
+              <th className="text-left px-4 py-2.5 font-semibold">Email</th>
+              <th className="text-left px-4 py-2.5 font-semibold">Message</th>
+              <th className="text-left px-4 py-2.5 font-semibold">When</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             {leads.map((l) => (
-              <tr key={l.id} className="border-t">
-                <td className="px-3 py-2">{l.name}</td>
-                <td className="px-3 py-2">
-                  {l.phone && <a href={`tel:${l.phone}`} className="text-blue-600">{l.phone}</a>}
+              <tr key={l.id} className="border-t border-[var(--border)] hover:bg-neutral-50/60">
+                <td className="px-4 py-2.5 font-medium">{l.name}</td>
+                <td className="px-4 py-2.5">
+                  {l.phone && <a href={`tel:${l.phone}`} className="brand-text font-medium">{l.phone}</a>}
                 </td>
-                <td className="px-3 py-2">{l.email}</td>
-                <td className="px-3 py-2 max-w-[220px] truncate">{l.message}</td>
-                <td className="px-3 py-2 text-neutral-500 whitespace-nowrap">
+                <td className="px-4 py-2.5">{l.email}</td>
+                <td className="px-4 py-2.5 max-w-[220px] truncate">{l.message}</td>
+                <td className="px-4 py-2.5 text-[var(--muted)] whitespace-nowrap">
                   {new Date(l.created_at).toLocaleString()}
                 </td>
-                <td className="px-3 py-2">
-                  <button onClick={() => remove(l.id)} className="text-red-500 text-xs">
+                <td className="px-4 py-2.5">
+                  <button onClick={() => remove(l.id)} className="text-red-400 hover:text-red-600 text-xs">
                     ✕
                   </button>
                 </td>

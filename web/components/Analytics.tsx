@@ -52,7 +52,7 @@ export default function Analytics({ code }: { code: QrCode }) {
 
   if (!code.is_dynamic) {
     return (
-      <p className="text-sm text-neutral-500">
+      <p className="text-sm text-[var(--muted)]">
         Static codes aren&apos;t tracked — they encode their content directly.
       </p>
     );
@@ -68,20 +68,20 @@ export default function Analytics({ code }: { code: QrCode }) {
         <span className="font-medium ml-3">Last scan:</span>{" "}
         {last ? new Date(last).toLocaleString() : "never"}
       </div>
-      <div>
-        <div className="text-xs text-neutral-500 mb-1">Scans, last 14 days</div>
+      <div className="card p-4">
+        <div className="text-xs text-[var(--muted)] mb-2">Scans, last 14 days</div>
         {loading ? (
-          <div className="text-xs text-neutral-400">loading…</div>
+          <div className="text-xs text-[var(--muted)]">loading…</div>
         ) : (
           <div className="flex items-end gap-1 h-24">
             {series.map((s) => (
               <div key={s.day} className="flex-1 flex flex-col items-center">
                 <div
-                  className="w-full bg-blue-500 rounded-t"
+                  className="w-full brand-gradient rounded-t-md"
                   style={{ height: `${(s.n / peak) * 100}%`, minHeight: s.n ? 2 : 0 }}
                   title={`${s.day}: ${s.n}`}
                 />
-                <div className="text-[8px] text-neutral-400 mt-0.5">
+                <div className="text-[8px] text-[var(--muted)] mt-1">
                   {s.day.slice(5)}
                 </div>
               </div>

@@ -44,16 +44,31 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-neutral-50 p-4">
+    <main className="min-h-screen flex items-center justify-center p-4 overflow-hidden">
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-10"
+        style={{
+          background:
+            "radial-gradient(50rem 36rem at 50% -10%, rgba(124,58,237,0.14), transparent 60%)",
+        }}
+      />
       <form
         onSubmit={submit}
-        className="w-full max-w-sm bg-white rounded-xl shadow-sm border p-6 space-y-4"
+        className="card w-full max-w-sm p-7 space-y-5"
       >
-        <div>
-          <h1 className="text-2xl font-semibold">Nanocer</h1>
-          <p className="text-sm text-neutral-500">
-            {mode === "signin" ? "Sign in to your account" : "Create an account"}
-          </p>
+        <div className="space-y-3">
+          <div className="brand-gradient w-11 h-11 rounded-2xl grid place-items-center text-white text-lg font-bold shadow-sm">
+            N
+          </div>
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Nanocer</h1>
+            <p className="text-sm text-[var(--muted)]">
+              {mode === "signin"
+                ? "Welcome back — sign in to continue."
+                : "Create your account to get started."}
+            </p>
+          </div>
         </div>
 
         <input
@@ -62,7 +77,7 @@ export default function LoginPage() {
           placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border rounded-lg px-3 py-2 text-sm"
+          className="input w-full"
         />
         <input
           type="password"
@@ -71,16 +86,16 @@ export default function LoginPage() {
           placeholder="Password (min 6 chars)"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border rounded-lg px-3 py-2 text-sm"
+          className="input w-full"
         />
 
-        {msg && <p className="text-sm text-amber-700">{msg}</p>}
+        {msg && (
+          <p className="text-sm text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+            {msg}
+          </p>
+        )}
 
-        <button
-          type="submit"
-          disabled={busy}
-          className="w-full bg-blue-600 text-white rounded-lg py-2 text-sm font-medium disabled:opacity-60"
-        >
+        <button type="submit" disabled={busy} className="btn btn-primary w-full">
           {busy ? "…" : mode === "signin" ? "Sign in" : "Sign up"}
         </button>
 
@@ -90,7 +105,7 @@ export default function LoginPage() {
             setMode(mode === "signin" ? "signup" : "signin");
             setMsg(null);
           }}
-          className="w-full text-sm text-blue-600"
+          className="w-full text-sm brand-text font-medium"
         >
           {mode === "signin"
             ? "Need an account? Sign up"

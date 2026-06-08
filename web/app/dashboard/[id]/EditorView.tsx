@@ -38,21 +38,20 @@ export default function EditorView({
   }
 
   return (
-    <main className="min-h-screen bg-neutral-50">
-      <header className="bg-white border-b px-4 py-3 flex items-center gap-3">
-        <button onClick={back} className="text-blue-600 text-sm font-medium">
+    <main className="min-h-screen">
+      <header className="bg-white/70 backdrop-blur border-b border-[var(--border)] px-4 sm:px-6 py-3 flex items-center gap-3 sticky top-0 z-30">
+        <button onClick={back} className="btn btn-secondary btn-sm">
           ← Back
         </button>
-        <span className="text-neutral-300">/</span>
-        <span className="text-sm font-medium truncate">
+        <span className="text-sm font-semibold truncate">
           {code.title || code.short_code}
         </span>
         <div className="ml-auto flex items-center gap-2">
-          <label className="text-xs text-neutral-500">Listing</label>
+          <label className="text-xs text-[var(--muted)] hidden sm:inline">Listing</label>
           <select
             value={listingId ?? ""}
             onChange={(e) => changeListing(e.target.value)}
-            className="border rounded-lg px-2 py-1 text-sm max-w-[220px]"
+            className="input py-1.5 text-sm max-w-[220px]"
           >
             <option value="">Unassigned (General)</option>
             {listings.map((l) => (
@@ -64,8 +63,8 @@ export default function EditorView({
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto p-5">
-        <div className="bg-white border rounded-xl p-5">
+      <div className="max-w-5xl mx-auto p-4 sm:p-6">
+        <div className="card p-5 sm:p-6">
           <CodeEditor
             code={code}
             userId={userId}

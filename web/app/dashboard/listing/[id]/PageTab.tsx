@@ -102,36 +102,37 @@ export default function PageTab({
   }
 
   return (
-    <div className="bg-white border rounded-xl p-5 space-y-4 max-w-xl">
-      <label className="flex items-center gap-2 text-sm">
+    <div className="card p-6 space-y-4 max-w-xl">
+      <label className="flex items-center gap-2 text-sm font-medium">
         <input
           type="checkbox"
           checked={enabled}
           onChange={(e) => setEnabled(e.target.checked)}
+          className="accent-violet-600 w-4 h-4"
         />
         Publish public property page
       </label>
 
       <label className="block">
-        <span className="text-xs text-neutral-500">Page URL</span>
-        <div className="flex items-center gap-1 text-sm">
-          <span className="text-neutral-400">/p/</span>
+        <span className="text-xs text-[var(--muted)]">Page URL</span>
+        <div className="flex items-center gap-1 text-sm mt-1">
+          <span className="text-[var(--muted)]">/p/</span>
           <input
             value={slug}
             onChange={(e) => setSlug(slugify(e.target.value))}
-            className="flex-1 border rounded-lg px-2 py-1.5"
+            className="input flex-1"
             placeholder="123-main-st"
           />
         </div>
         {enabled && slug && (
-          <div className="mt-1 text-xs text-neutral-500 flex items-center gap-2">
-            <a href={publicUrl} target="_blank" rel="noreferrer" className="text-blue-600 truncate">
+          <div className="mt-1.5 text-xs text-[var(--muted)] flex items-center gap-2">
+            <a href={publicUrl} target="_blank" rel="noreferrer" className="brand-text font-medium truncate">
               {publicUrl}
             </a>
             <button
               type="button"
               onClick={() => navigator.clipboard.writeText(publicUrl)}
-              className="text-blue-600"
+              className="brand-text font-medium"
             >
               Copy
             </button>
@@ -140,35 +141,35 @@ export default function PageTab({
       </label>
 
       <div>
-        <span className="text-xs text-neutral-500">Photos</span>
+        <span className="text-xs text-[var(--muted)]">Photos</span>
         <div className="flex flex-wrap gap-2 mt-1">
           {photos.map((src, i) => (
             <div key={i} className="relative">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt="" className="w-16 h-16 object-cover rounded border" />
+              <img src={src} alt="" className="w-16 h-16 object-cover rounded-xl border border-[var(--border)]" />
               <button
                 onClick={() => setPhotos((p) => p.filter((_, j) => j !== i))}
-                className="absolute -top-1 -right-1 bg-white border rounded-full w-5 h-5 text-xs text-red-600"
+                className="absolute -top-1.5 -right-1.5 bg-white border border-[var(--border)] shadow-sm rounded-full w-5 h-5 text-xs text-red-500 grid place-items-center"
               >
                 ✕
               </button>
             </div>
           ))}
-          <label className="w-16 h-16 border border-dashed rounded flex items-center justify-center text-neutral-400 text-xl cursor-pointer">
+          <label className="w-16 h-16 border border-dashed border-violet-300 bg-violet-50/50 rounded-xl flex items-center justify-center text-violet-400 text-xl cursor-pointer hover:bg-violet-50 transition">
             +
             <input type="file" accept="image/*" multiple onChange={addPhotos} className="hidden" />
           </label>
         </div>
       </div>
 
-      <div className="border-t pt-3 space-y-2">
-        <span className="text-xs font-medium text-neutral-500">Agent</span>
+      <div className="border-t border-[var(--border)] pt-4 space-y-2">
+        <span className="text-xs font-semibold text-[var(--muted)]">Agent</span>
         <div className="grid grid-cols-2 gap-2">
-          <input placeholder="Name" value={agent.name ?? ""} onChange={(e) => setAgent({ ...agent, name: e.target.value })} className="border rounded-lg px-2 py-1.5 text-sm" />
-          <input placeholder="Phone" value={agent.phone ?? ""} onChange={(e) => setAgent({ ...agent, phone: e.target.value })} className="border rounded-lg px-2 py-1.5 text-sm" />
-          <input placeholder="Email" value={agent.email ?? ""} onChange={(e) => setAgent({ ...agent, email: e.target.value })} className="border rounded-lg px-2 py-1.5 text-sm col-span-2" />
+          <input placeholder="Name" value={agent.name ?? ""} onChange={(e) => setAgent({ ...agent, name: e.target.value })} className="input" />
+          <input placeholder="Phone" value={agent.phone ?? ""} onChange={(e) => setAgent({ ...agent, phone: e.target.value })} className="input" />
+          <input placeholder="Email" value={agent.email ?? ""} onChange={(e) => setAgent({ ...agent, email: e.target.value })} className="input col-span-2" />
         </div>
-        <label className="text-xs text-neutral-500 flex items-center gap-2">
+        <label className="text-xs text-[var(--muted)] flex items-center gap-2">
           Photo:
           <input type="file" accept="image/*" onChange={setAgentPhoto} className="text-xs" />
           {agent.photo_url && (
@@ -178,8 +179,8 @@ export default function PageTab({
         </label>
       </div>
 
-      <div className="border-t pt-3 space-y-2">
-        <span className="text-xs font-medium text-neutral-500">
+      <div className="border-t border-[var(--border)] pt-4 space-y-2">
+        <span className="text-xs font-semibold text-[var(--muted)]">
           Primary button (besides the tour form)
         </span>
         <div className="flex gap-2 items-center">
@@ -188,7 +189,7 @@ export default function PageTab({
             onChange={(e) =>
               setCta({ ...cta, type: e.target.value as "tour" | "text" | "link" })
             }
-            className="border rounded-lg px-2 py-1.5 text-sm"
+            className="input"
           >
             <option value="tour">Tour form only</option>
             <option value="text">Text me</option>
@@ -199,7 +200,7 @@ export default function PageTab({
               placeholder={cta.type === "text" ? "Phone number" : "https://…"}
               value={cta.value ?? ""}
               onChange={(e) => setCta({ ...cta, value: e.target.value })}
-              className="flex-1 border rounded-lg px-2 py-1.5 text-sm"
+              className="input flex-1"
             />
           )}
         </div>
@@ -207,7 +208,7 @@ export default function PageTab({
 
       <label className="flex items-center gap-2 text-sm">
         Accent color
-        <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="h-8 w-12 border rounded" />
+        <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="h-9 w-12 border border-[var(--border)] rounded-lg cursor-pointer" />
       </label>
 
       <QuizEditor
@@ -217,10 +218,10 @@ export default function PageTab({
       />
 
       <div className="flex items-center gap-3">
-        <button onClick={save} disabled={busy} className="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-60">
+        <button onClick={save} disabled={busy} className="btn btn-primary">
           {busy ? "Saving…" : "Save page"}
         </button>
-        {msg && <span className="text-sm text-neutral-600">{msg}</span>}
+        {msg && <span className="text-sm text-[var(--muted)]">{msg}</span>}
       </div>
     </div>
   );

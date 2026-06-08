@@ -30,7 +30,7 @@ function PlanCta({ cta, accent }: { cta: CtaConfig; accent: string }) {
     return (
       <a
         href={`sms:${cta.value}`}
-        className="block text-center text-white rounded-lg py-2 text-sm font-medium"
+        className="block text-center text-white rounded-xl py-2.5 text-sm font-semibold shadow-sm"
         style={{ background: accent }}
       >
         {cta.label || "Text me about this"}
@@ -43,7 +43,7 @@ function PlanCta({ cta, accent }: { cta: CtaConfig; accent: string }) {
         href={cta.value}
         target="_blank"
         rel="noopener noreferrer"
-        className="block text-center text-white rounded-lg py-2 text-sm font-medium"
+        className="block text-center text-white rounded-xl py-2.5 text-sm font-semibold shadow-sm"
         style={{ background: accent }}
       >
         {cta.label || "Learn more"}
@@ -55,20 +55,20 @@ function PlanCta({ cta, accent }: { cta: CtaConfig; accent: string }) {
 
 function PlanCard({ plan, accent }: { plan: FloorPlan; accent: string }) {
   return (
-    <div className="border rounded-xl overflow-hidden">
+    <div className="border border-[var(--border)] rounded-2xl overflow-hidden shadow-sm">
       {plan.photo_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={plan.photo_url} alt={plan.name} className="w-full aspect-[4/3] object-cover" />
       ) : null}
       <div className="p-3 space-y-2">
         <div>
-          <div className="font-medium">{plan.name}</div>
+          <div className="font-semibold">{plan.name}</div>
           {planFacts(plan) && (
-            <div className="text-sm text-neutral-600">{planFacts(plan)}</div>
+            <div className="text-sm text-[var(--muted)]">{planFacts(plan)}</div>
           )}
         </div>
         {plan.description && (
-          <p className="text-sm text-neutral-700 whitespace-pre-wrap">
+          <p className="text-sm text-[var(--ink)]/80 whitespace-pre-wrap">
             {plan.description}
           </p>
         )}
@@ -113,18 +113,18 @@ export default function PropertyQuiz({
 
   if (stage === "intro") {
     return (
-      <section className="border rounded-xl p-4 bg-neutral-50 space-y-3">
+      <section className="border border-[var(--border)] rounded-2xl p-4 bg-neutral-50/70 space-y-3">
         <div>
-          <h2 className="text-sm font-semibold">
+          <h2 className="text-base font-semibold">
             {quiz.title || "Find your floor plan"}
           </h2>
           {quiz.intro && (
-            <p className="text-sm text-neutral-600 mt-1">{quiz.intro}</p>
+            <p className="text-sm text-[var(--muted)] mt-1">{quiz.intro}</p>
           )}
         </div>
         <button
           onClick={() => setStage("quiz")}
-          className="w-full text-white rounded-lg py-2.5 text-sm font-medium"
+          className="w-full text-white rounded-xl py-3 text-sm font-semibold shadow-sm"
           style={{ background: accent }}
         >
           Get matched in {questions.length}{" "}
@@ -136,23 +136,30 @@ export default function PropertyQuiz({
 
   if (stage === "quiz") {
     const q = questions[step];
+    const progress = ((step + 1) / questions.length) * 100;
     return (
-      <section className="border rounded-xl p-4 space-y-3">
+      <section className="border border-[var(--border)] rounded-2xl p-4 space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-neutral-500">
+          <span className="text-xs text-[var(--muted)]">
             Question {step + 1} of {questions.length}
           </span>
-          <button onClick={restart} className="text-xs text-neutral-400">
+          <button onClick={restart} className="text-xs text-[var(--muted)] hover:text-[var(--ink)]">
             Start over
           </button>
         </div>
-        <h2 className="text-sm font-medium">{q.label}</h2>
+        <div className="h-1.5 rounded-full bg-neutral-100 overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all"
+            style={{ width: `${progress}%`, background: accent }}
+          />
+        </div>
+        <h2 className="text-base font-medium">{q.label}</h2>
         <div className="space-y-2">
           {q.options.map((o) => (
             <button
               key={o.id}
               onClick={() => choose(q.id, o.id)}
-              className="w-full text-left border rounded-lg px-3 py-2.5 text-sm hover:border-neutral-400 transition"
+              className="w-full text-left border border-[var(--border)] rounded-xl px-3 py-3 text-sm hover:border-violet-400 hover:bg-violet-50/40 transition"
             >
               {o.label}
             </button>
@@ -170,12 +177,12 @@ export default function PropertyQuiz({
   const recommendation = top.map((p) => p.name).join(", ");
 
   return (
-    <section className="border rounded-xl p-4 space-y-4">
+    <section className="border border-[var(--border)] rounded-2xl p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold">
+        <h2 className="text-base font-semibold">
           {top.length > 1 ? "Your best matches" : "Your best match"}
         </h2>
-        <button onClick={restart} className="text-xs text-neutral-400">
+        <button onClick={restart} className="text-xs text-[var(--muted)] hover:text-[var(--ink)]">
           Start over
         </button>
       </div>
@@ -186,7 +193,7 @@ export default function PropertyQuiz({
         ))}
       </div>
 
-      <div className="border-t pt-3">
+      <div className="border-t border-[var(--border)] pt-3">
         <h3 className="text-sm font-medium mb-2">
           Want details on {top.length > 1 ? "these" : "this"}? Send your info.
         </h3>

@@ -112,28 +112,42 @@ export default function CodeEditor({
       {/* form */}
       <div className="space-y-4">
         <label className="block">
-          <span className="text-xs text-neutral-500">Title</span>
+          <span className="text-xs text-[var(--muted)]">Title</span>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 text-sm"
+            className="input w-full mt-1"
           />
         </label>
 
-        <div className="flex gap-3 text-sm">
-          <label className="flex items-center gap-1">
+        <div className="flex gap-2 text-sm">
+          <label
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition flex-1 ${
+              isDynamic
+                ? "border-violet-300 bg-violet-50 text-violet-700"
+                : "border-[var(--border)] text-[var(--muted)]"
+            }`}
+          >
             <input
               type="radio"
               checked={isDynamic}
               onChange={() => setIsDynamic(true)}
+              className="accent-violet-600"
             />
             Dynamic (editable later)
           </label>
-          <label className="flex items-center gap-1">
+          <label
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition flex-1 ${
+              !isDynamic
+                ? "border-violet-300 bg-violet-50 text-violet-700"
+                : "border-[var(--border)] text-[var(--muted)]"
+            }`}
+          >
             <input
               type="radio"
               checked={!isDynamic}
               onChange={() => setIsDynamic(false)}
+              className="accent-violet-600"
             />
             Static (fixed)
           </label>
@@ -141,58 +155,58 @@ export default function CodeEditor({
 
         {isDynamic ? (
           <label className="block">
-            <span className="text-xs text-neutral-500">Destination URL</span>
+            <span className="text-xs text-[var(--muted)]">Destination URL</span>
             <input
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
               placeholder="https://example.com/landing"
-              className="w-full border rounded-lg px-3 py-2 text-sm"
+              className="input w-full mt-1"
             />
           </label>
         ) : (
           <label className="block">
-            <span className="text-xs text-neutral-500">Static content</span>
+            <span className="text-xs text-[var(--muted)]">Static content</span>
             <input
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="URL or text to encode"
-              className="w-full border rounded-lg px-3 py-2 text-sm"
+              className="input w-full mt-1"
             />
           </label>
         )}
 
-        <p className="text-[11px] text-neutral-400 break-all">
+        <p className="text-[11px] text-[var(--muted)] break-all bg-neutral-50 rounded-lg px-3 py-2">
           Encodes: {value}
         </p>
 
         {/* styling */}
         <div className="grid grid-cols-2 gap-3">
           <label className="block">
-            <span className="text-xs text-neutral-500">Foreground</span>
+            <span className="text-xs text-[var(--muted)]">Foreground</span>
             <input
               type="color"
               value={style.fill_color}
               onChange={(e) => patchStyle({ fill_color: e.target.value })}
-              className="w-full h-9 border rounded-lg"
+              className="w-full h-10 border border-[var(--border)] rounded-xl mt-1 cursor-pointer"
             />
           </label>
           <label className="block">
-            <span className="text-xs text-neutral-500">Background</span>
+            <span className="text-xs text-[var(--muted)]">Background</span>
             <input
               type="color"
               value={style.back_color}
               onChange={(e) => patchStyle({ back_color: e.target.value })}
-              className="w-full h-9 border rounded-lg"
+              className="w-full h-10 border border-[var(--border)] rounded-xl mt-1 cursor-pointer"
             />
           </label>
           <label className="block">
-            <span className="text-xs text-neutral-500">Module shape</span>
+            <span className="text-xs text-[var(--muted)]">Module shape</span>
             <select
               value={style.module_style}
               onChange={(e) =>
                 patchStyle({ module_style: e.target.value as QrStyle["module_style"] })
               }
-              className="w-full border rounded-lg px-2 py-2 text-sm"
+              className="input w-full mt-1"
             >
               {MODULE_STYLES.map((m) => (
                 <option key={m} value={m}>
@@ -202,7 +216,7 @@ export default function CodeEditor({
             </select>
           </label>
           <label className="block">
-            <span className="text-xs text-neutral-500">Error correction</span>
+            <span className="text-xs text-[var(--muted)]">Error correction</span>
             <select
               value={style.error_correction}
               onChange={(e) =>
@@ -210,7 +224,7 @@ export default function CodeEditor({
                   error_correction: e.target.value as QrStyle["error_correction"],
                 })
               }
-              className="w-full border rounded-lg px-2 py-2 text-sm"
+              className="input w-full mt-1"
             >
               {(["L", "M", "Q", "H"] as const).map((m) => (
                 <option key={m} value={m}>
@@ -222,7 +236,7 @@ export default function CodeEditor({
         </div>
 
         <div className="space-y-1">
-          <span className="text-xs text-neutral-500">Centre logo</span>
+          <span className="text-xs text-[var(--muted)]">Centre logo</span>
           <div className="flex items-center gap-2">
             <input
               ref={fileRef}
@@ -234,7 +248,7 @@ export default function CodeEditor({
             {style.logo_url && (
               <button
                 onClick={() => patchStyle({ logo_url: "" })}
-                className="text-xs text-red-600"
+                className="text-xs text-red-500 hover:text-red-600"
               >
                 remove
               </button>
@@ -242,7 +256,7 @@ export default function CodeEditor({
           </div>
           {style.logo_url && (
             <label className="block">
-              <span className="text-xs text-neutral-500">
+              <span className="text-xs text-[var(--muted)]">
                 Logo size: {Math.round(style.logo_scale * 100)}%
               </span>
               <input
@@ -252,7 +266,7 @@ export default function CodeEditor({
                 step={0.02}
                 value={style.logo_scale}
                 onChange={(e) => patchStyle({ logo_scale: Number(e.target.value) })}
-                className="w-full"
+                className="w-full accent-violet-600"
               />
             </label>
           )}
@@ -262,45 +276,45 @@ export default function CodeEditor({
           <button
             onClick={save}
             disabled={busy === "save"}
-            className="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-60"
+            className="btn btn-primary"
           >
             {busy === "save" ? "Saving…" : "Save changes"}
           </button>
           <button
             onClick={() => exportImage("png")}
             disabled={busy === "png"}
-            className="border rounded-lg px-3 py-2 text-sm"
+            className="btn btn-secondary"
           >
             {busy === "png" ? "…" : "Export PNG"}
           </button>
           <button
             onClick={() => exportImage("svg")}
             disabled={busy === "svg"}
-            className="border rounded-lg px-3 py-2 text-sm"
+            className="btn btn-secondary"
           >
             {busy === "svg" ? "…" : "Export SVG"}
           </button>
           <button
             onClick={remove}
             disabled={busy === "delete"}
-            className="border border-red-300 text-red-600 rounded-lg px-3 py-2 text-sm"
+            className="btn btn-danger"
           >
             Delete
           </button>
         </div>
-        {msg && <p className="text-sm text-neutral-600">{msg}</p>}
+        {msg && <p className="text-sm text-[var(--muted)]">{msg}</p>}
       </div>
 
       {/* preview + analytics */}
       <div className="space-y-5">
         <div>
           <QrPreview value={value} style={style} />
-          <p className="text-[11px] text-neutral-400 mt-1">
+          <p className="text-[11px] text-[var(--muted)] mt-1">
             The downloaded file uses the same renderer as this preview, so they
             match exactly.
           </p>
         </div>
-        <div className="border-t pt-4">
+        <div className="border-t border-[var(--border)] pt-4">
           <Analytics code={code} />
         </div>
       </div>

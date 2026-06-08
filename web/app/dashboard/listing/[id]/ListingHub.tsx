@@ -125,24 +125,23 @@ export default function ListingHub({
   const label = listing.name || listing.address || "(untitled)";
 
   return (
-    <main className="min-h-screen bg-neutral-50">
-      <header className="bg-white border-b px-4 py-3 flex items-center gap-3">
+    <main className="min-h-screen">
+      <header className="bg-white/70 backdrop-blur border-b border-[var(--border)] px-4 sm:px-6 py-3 flex items-center gap-3 sticky top-0 z-30">
         <button
           onClick={() => {
             router.push("/dashboard");
             router.refresh();
           }}
-          className="text-blue-600 text-sm font-medium"
+          className="btn btn-secondary btn-sm"
         >
           ← Listings
         </button>
-        <span className="text-neutral-300">/</span>
-        <span className="text-sm font-medium truncate">{label}</span>
+        <span className="text-sm font-semibold truncate">{label}</span>
         <div className="ml-auto flex items-center gap-2">
           <select
             value={listing.status}
             onChange={(e) => setStatus(e.target.value as ListingStatus)}
-            className={`text-xs rounded px-2 py-1 border ${STATUS_COLOR[listing.status]}`}
+            className={`chip border-0 cursor-pointer ${STATUS_COLOR[listing.status]}`}
           >
             {LISTING_STATUSES.map((s) => (
               <option key={s.value} value={s.value}>
@@ -150,22 +149,22 @@ export default function ListingHub({
               </option>
             ))}
           </select>
-          <button onClick={deleteListing} className="text-sm text-red-600">
+          <button onClick={deleteListing} className="btn btn-danger btn-sm">
             Delete
           </button>
         </div>
       </header>
 
-      <div className="border-b bg-white px-4">
-        <nav className="flex gap-1 text-sm">
+      <div className="bg-white/70 backdrop-blur border-b border-[var(--border)] px-4 sm:px-6">
+        <nav className="flex gap-1 text-sm max-w-4xl mx-auto overflow-x-auto py-2">
           {(["overview", "codes", "page", "leads", "analytics"] as Tab[]).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-3 py-2 capitalize border-b-2 -mb-px ${
+              className={`px-3.5 py-1.5 rounded-full capitalize whitespace-nowrap transition ${
                 tab === t
-                  ? "border-blue-600 text-blue-700"
-                  : "border-transparent text-neutral-500 hover:text-neutral-800"
+                  ? "brand-gradient text-white shadow-sm"
+                  : "text-[var(--muted)] hover:bg-neutral-100"
               }`}
             >
               {t}
@@ -175,44 +174,40 @@ export default function ListingHub({
         </nav>
       </div>
 
-      <div className="max-w-4xl mx-auto p-5">
+      <div className="max-w-4xl mx-auto p-4 sm:p-6">
         {tab === "overview" && (
-          <div className="bg-white border rounded-xl p-5 space-y-3 max-w-xl">
+          <div className="card p-6 space-y-4 max-w-xl">
             <label className="block">
-              <span className="text-xs text-neutral-500">Address / name</span>
+              <span className="text-xs text-[var(--muted)]">Address / name</span>
               <input
                 value={form.address}
                 onChange={(e) => setForm({ ...form, address: e.target.value })}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
+                className="input w-full mt-1"
               />
             </label>
             <div className="grid grid-cols-4 gap-2">
               {(["price", "beds", "baths", "sqft"] as const).map((k) => (
                 <label key={k} className="block">
-                  <span className="text-xs text-neutral-500 capitalize">{k}</span>
+                  <span className="text-xs text-[var(--muted)] capitalize">{k}</span>
                   <input
                     value={form[k]}
                     onChange={(e) => setForm({ ...form, [k]: e.target.value })}
                     inputMode="numeric"
-                    className="w-full border rounded-lg px-2 py-2 text-sm"
+                    className="input w-full mt-1"
                   />
                 </label>
               ))}
             </div>
             <label className="block">
-              <span className="text-xs text-neutral-500">Description</span>
+              <span className="text-xs text-[var(--muted)]">Description</span>
               <textarea
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 rows={3}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
+                className="input w-full mt-1"
               />
             </label>
-            <button
-              onClick={saveDetails}
-              disabled={busy}
-              className="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-60"
-            >
+            <button onClick={saveDetails} disabled={busy} className="btn btn-primary">
               {busy ? "Saving…" : "Save details"}
             </button>
           </div>
@@ -220,38 +215,38 @@ export default function ListingHub({
 
         {tab === "codes" && (
           <div>
-            <div className="flex gap-2 mb-3">
+            <div className="flex gap-2 mb-4">
               <button
                 onClick={() => addCode(true)}
                 disabled={busy}
-                className="bg-blue-600 text-white rounded-lg px-3 py-1.5 text-sm"
+                className="btn btn-primary btn-sm"
               >
                 + Dynamic code
               </button>
               <button
                 onClick={() => addCode(false)}
                 disabled={busy}
-                className="border rounded-lg px-3 py-1.5 text-sm"
+                className="btn btn-secondary btn-sm"
               >
                 + Static code
               </button>
             </div>
             {codes.length === 0 ? (
-              <div className="text-center text-neutral-400 text-sm py-16 border rounded-xl bg-white">
+              <div className="card text-center text-[var(--muted)] text-sm py-16">
                 No codes yet for this listing.
               </div>
             ) : (
-              <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(170px,1fr))]">
+              <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]">
                 {codes.map((c) => (
                   <div
                     key={c.id}
                     onClick={() => router.push(`/dashboard/${c.id}`)}
-                    className="bg-white border rounded-xl p-3 hover:shadow-md transition cursor-pointer"
+                    className="card card-hover p-4 cursor-pointer"
                   >
                     <div className="flex justify-center">
                       <QrThumb value={encodedValue(c, siteUrl())} style={c.style} size={120} />
                     </div>
-                    <div className="mt-2 flex items-center justify-between gap-2">
+                    <div className="mt-3 flex items-center justify-between gap-2">
                       <span className="text-sm font-medium truncate">
                         {c.title || "(untitled)"}
                       </span>
@@ -260,12 +255,12 @@ export default function ListingHub({
                           e.stopPropagation();
                           deleteCode(c);
                         }}
-                        className="text-red-500 text-xs shrink-0"
+                        className="text-red-400 hover:text-red-600 text-xs shrink-0"
                       >
                         ✕
                       </button>
                     </div>
-                    <div className="text-[11px] text-neutral-400">
+                    <div className="text-[11px] text-[var(--muted)] mt-0.5">
                       {c.is_dynamic ? `${c.scan_count} scans` : "static"}
                     </div>
                   </div>
@@ -286,7 +281,7 @@ export default function ListingHub({
         {tab === "leads" && <LeadsTab listingId={listing.id} />}
 
         {tab === "analytics" && (
-          <div className="text-center text-neutral-400 text-sm py-16 border rounded-xl bg-white">
+          <div className="card text-center text-[var(--muted)] text-sm py-16">
             Per-listing analytics — coming soon.
           </div>
         )}
