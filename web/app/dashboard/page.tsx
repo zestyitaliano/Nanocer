@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import Dashboard from "./Dashboard";
-import type { QrCode } from "@/lib/types";
+import DashboardHome from "./DashboardHome";
+import type { QrCode, Folder } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -12,14 +12,15 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: codes } = await supabase
-    .from("codes")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const [{ data: codes }, { data: folders }] = await Promise.all([
+    supabase.from("codes").select("*").order("created_at", { ascending: false }),
+    supabase.from("folders").select("*").order("name", { ascending: true }),
+  ]);
 
   return (
-    <Dashboard
+    <DashboardHome
       initialCodes={(codes ?? []) as QrCode[]}
+      initialFolders={(folders ?? []) as Folder[]}
       userId={user.id}
       userEmail={user.email ?? ""}
     />
