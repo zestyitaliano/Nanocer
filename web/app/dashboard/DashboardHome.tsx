@@ -12,12 +12,13 @@ import {
   type QrCode,
 } from "@/lib/types";
 import ListingCard from "@/components/ListingCard";
+import BrandMark from "@/components/BrandMark";
 
 type StatusFilter = "all" | ListingStatus;
 
 // Dot colour per status for the sidebar nav.
 const STATUS_DOT: Record<StatusFilter, string> = {
-  all: "bg-violet-500",
+  all: "bg-orange-500",
   other: "bg-neutral-300",
   active: "bg-emerald-500",
   leased_up: "bg-rose-400",
@@ -100,7 +101,9 @@ export default function DashboardHome({
       {/* Sidebar ----------------------------------------------------- */}
       <aside className="hidden md:flex flex-col gap-6 p-5 border-r border-[var(--border)] bg-white/60 backdrop-blur">
         <div className="flex items-center gap-2.5 px-1">
-          <div className="brand-gradient w-9 h-9 rounded-2xl grid place-items-center text-white font-bold shadow-sm">N</div>
+          <div className="brand-gradient w-9 h-9 rounded-2xl grid place-items-center text-white shadow-sm">
+            <BrandMark className="w-4 h-4" />
+          </div>
           <span className="font-display font-semibold text-lg tracking-tight">Nanocer</span>
         </div>
 
@@ -126,7 +129,9 @@ export default function DashboardHome({
       {/* Main -------------------------------------------------------- */}
       <main className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl w-full mx-auto">
         <div className="flex items-center gap-3">
-          <span className="md:hidden brand-gradient w-9 h-9 rounded-2xl grid place-items-center text-white font-bold shrink-0">N</span>
+          <span className="md:hidden brand-gradient w-9 h-9 rounded-2xl grid place-items-center text-white shrink-0">
+            <BrandMark className="w-4 h-4" />
+          </span>
           <div className="relative flex-1 max-w-md">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8">
               <circle cx="9" cy="9" r="6" />
@@ -140,7 +145,7 @@ export default function DashboardHome({
           <button onClick={signOut} className="md:hidden btn btn-secondary btn-sm">Sign out</button>
         </div>
 
-        <section className="brand-gradient relative overflow-hidden rounded-3xl px-6 sm:px-8 py-7 text-white shadow-[0_12px_36px_rgba(99,72,235,0.32)]">
+        <section className="brand-gradient relative overflow-hidden rounded-3xl px-6 sm:px-8 py-7 text-white shadow-[0_12px_36px_rgba(235,94,40,0.32)]">
           <div aria-hidden className="absolute -right-10 -top-10 w-52 h-52 rounded-full bg-white/10" />
           <div aria-hidden className="absolute right-16 bottom-[-3rem] w-40 h-40 rounded-full bg-white/10" />
           <div className="relative max-w-lg space-y-3">
@@ -209,7 +214,7 @@ export default function DashboardHome({
 function StatCard({ label, value, icon }: { label: string; value: number; icon: string }) {
   return (
     <div className="card p-4 sm:p-5 flex items-center gap-3 sm:gap-4">
-      <div className="w-11 h-11 rounded-2xl grid place-items-center text-lg bg-violet-50 shrink-0">{icon}</div>
+      <div className="w-11 h-11 rounded-2xl grid place-items-center text-lg bg-orange-50 shrink-0">{icon}</div>
       <div className="min-w-0">
         <div className="font-display text-xl sm:text-2xl font-bold tracking-tight leading-none">{value.toLocaleString()}</div>
         <div className="text-xs text-[var(--muted)] mt-1 truncate">{label}</div>
@@ -223,12 +228,12 @@ function SidebarItem({ label, dot, count, active, onClick }: { label: string; do
     <button
       onClick={onClick}
       className={`w-full text-left px-3 py-2 rounded-xl text-sm flex items-center gap-2.5 transition ${
-        active ? "bg-violet-50 text-violet-700 font-medium" : "text-[var(--ink)] hover:bg-neutral-100"
+        active ? "bg-orange-50 text-orange-700 font-medium" : "text-[var(--ink)] hover:bg-neutral-100"
       }`}
     >
       <span className={`w-2 h-2 rounded-full ${dot}`} />
       <span className="truncate flex-1">{label}</span>
-      <span className={`text-[11px] ${active ? "text-violet-500" : "text-[var(--muted)]"}`}>{count}</span>
+      <span className={`text-[11px] ${active ? "text-orange-500" : "text-[var(--muted)]"}`}>{count}</span>
     </button>
   );
 }
@@ -286,7 +291,7 @@ function NewPropertyModal({
             <label className="block"><span className="text-xs text-[var(--muted)]">Baths</span><input value={baths} onChange={(e) => setBaths(e.target.value)} inputMode="numeric" className="input w-full mt-1" /></label>
           </div>
         ) : (
-          <p className="text-xs text-[var(--muted)] bg-violet-50 rounded-lg px-3 py-2">
+          <p className="text-xs text-[var(--muted)] bg-orange-50 rounded-lg px-3 py-2">
             Add floor plans (units) with their own beds/baths/pricing after creating — in the property&apos;s <span className="font-medium">Page</span> tab.
           </p>
         )}

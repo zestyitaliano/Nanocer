@@ -153,7 +153,7 @@ export default function CodeEditor({
           <label
             className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition flex-1 ${
               isDynamic
-                ? "border-violet-300 bg-violet-50 text-violet-700"
+                ? "border-orange-300 bg-orange-50 text-orange-700"
                 : "border-[var(--border)] text-[var(--muted)]"
             }`}
           >
@@ -161,14 +161,14 @@ export default function CodeEditor({
               type="radio"
               checked={isDynamic}
               onChange={() => setIsDynamic(true)}
-              className="accent-violet-600"
+              className="accent-orange-600"
             />
             Dynamic (editable later)
           </label>
           <label
             className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition flex-1 ${
               !isDynamic
-                ? "border-violet-300 bg-violet-50 text-violet-700"
+                ? "border-orange-300 bg-orange-50 text-orange-700"
                 : "border-[var(--border)] text-[var(--muted)]"
             }`}
           >
@@ -176,7 +176,7 @@ export default function CodeEditor({
               type="radio"
               checked={!isDynamic}
               onChange={() => setIsDynamic(false)}
-              className="accent-violet-600"
+              className="accent-orange-600"
             />
             Static (fixed)
           </label>
@@ -199,7 +199,7 @@ export default function CodeEditor({
                     key={mode}
                     className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition ${
                       targetMode === mode
-                        ? "border-violet-300 bg-violet-50 text-violet-700"
+                        ? "border-orange-300 bg-orange-50 text-orange-700"
                         : "border-[var(--border)] text-[var(--muted)]"
                     }`}
                   >
@@ -207,7 +207,7 @@ export default function CodeEditor({
                       type="radio"
                       checked={targetMode === mode}
                       onChange={() => setTargetMode(mode)}
-                      className="accent-violet-600"
+                      className="accent-orange-600"
                     />
                     {label}
                   </label>
@@ -218,7 +218,7 @@ export default function CodeEditor({
             {listing && targetMode === "listing_page" ? (
               <>
                 {listing.page_enabled && listing.slug ? (
-                  <p className="text-[11px] text-[var(--muted)] bg-violet-50 rounded-lg px-3 py-2">
+                  <p className="text-[11px] text-[var(--muted)] bg-orange-50 rounded-lg px-3 py-2">
                     Resolves to{" "}
                     <span className="font-medium">/p/{listing.slug}</span> —
                     change the page in the property&apos;s Page tab and every code
@@ -259,7 +259,7 @@ export default function CodeEditor({
                   ))}
                 </select>
                 {listing.page_enabled && listing.slug ? (
-                  <p className="text-[11px] text-[var(--muted)] bg-violet-50 rounded-lg px-3 py-2">
+                  <p className="text-[11px] text-[var(--muted)] bg-orange-50 rounded-lg px-3 py-2">
                     Lands on this plan&apos;s section of{" "}
                     <span className="font-medium">/p/{listing.slug}</span> and
                     counts as a scan for the plan (per-unit analytics).
@@ -385,7 +385,7 @@ export default function CodeEditor({
                 step={0.02}
                 value={style.logo_scale}
                 onChange={(e) => patchStyle({ logo_scale: Number(e.target.value) })}
-                className="w-full accent-violet-600"
+                className="w-full accent-orange-600"
               />
             </label>
           )}

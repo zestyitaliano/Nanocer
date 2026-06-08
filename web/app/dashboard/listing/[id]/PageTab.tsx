@@ -46,7 +46,7 @@ export default function PageTab({
   const [cta, setCta] = useState<NonNullable<PageConfig["cta"]>>(
     cfg0.cta ?? { type: "tour" },
   );
-  const [color, setColor] = useState(cfg0.theme?.color ?? "#1a73e8");
+  const [color, setColor] = useState(cfg0.theme?.color ?? "#eb5e28");
   const [quiz, setQuiz] = useState<QuizConfig>(cfg0.quiz ?? {});
   const [plans, setPlans] = useState<FloorPlan[]>(initialPlans);
   const [propertyType, setPropertyType] = useState<PropertyType>(
@@ -138,7 +138,7 @@ export default function PageTab({
           type="checkbox"
           checked={enabled}
           onChange={(e) => setEnabled(e.target.checked)}
-          className="accent-violet-600 w-4 h-4"
+          className="accent-orange-600 w-4 h-4"
         />
         Publish public property page
       </label>
@@ -247,7 +247,7 @@ export default function PageTab({
               </button>
             </div>
           ))}
-          <label className="w-16 h-16 border border-dashed border-violet-300 bg-violet-50/50 rounded-xl flex items-center justify-center text-violet-400 text-xl cursor-pointer hover:bg-violet-50 transition">
+          <label className="w-16 h-16 border border-dashed border-orange-300 bg-orange-50/50 rounded-xl flex items-center justify-center text-orange-400 text-xl cursor-pointer hover:bg-orange-50 transition">
             +
             <input type="file" accept="image/*" multiple onChange={addPhotos} className="hidden" />
           </label>

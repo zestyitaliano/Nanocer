@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import BrandMark from "@/components/BrandMark";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -50,7 +51,7 @@ export default function LoginPage() {
         className="pointer-events-none fixed inset-0 -z-10"
         style={{
           background:
-            "radial-gradient(50rem 36rem at 50% -10%, rgba(124,58,237,0.14), transparent 60%)",
+            "radial-gradient(50rem 36rem at 50% -10%, rgba(235, 94, 40,0.14), transparent 60%)",
         }}
       />
       <form
@@ -58,8 +59,8 @@ export default function LoginPage() {
         className="card w-full max-w-sm p-7 space-y-5"
       >
         <div className="space-y-3">
-          <div className="brand-gradient w-11 h-11 rounded-2xl grid place-items-center text-white text-lg font-bold shadow-sm">
-            N
+          <div className="brand-gradient w-11 h-11 rounded-2xl grid place-items-center text-white shadow-sm">
+            <BrandMark className="w-5 h-5" />
           </div>
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Nanocer</h1>

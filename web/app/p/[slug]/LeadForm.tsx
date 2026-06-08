@@ -5,7 +5,7 @@ import { submitLead } from "./actions";
 
 export default function LeadForm({
   listingId,
-  accent = "#1a73e8",
+  accent = "#eb5e28",
   label = "Request a tour",
   busyLabel = "Sending…",
   // Quiz context, when this form is rendered after the floor-plan finder.

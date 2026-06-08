@@ -121,7 +121,7 @@ export function OpenHouseTemplate({
       ) : null}
       <div className="p-5 space-y-4">
         <div>
-          <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-1.5 bg-violet-100 text-violet-800">
+          <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-1.5 bg-orange-100 text-orange-800">
             Open house
           </span>
           <h1 className="text-2xl font-bold tracking-tight">{title}</h1>

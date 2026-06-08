@@ -2,21 +2,22 @@
 
 /* ------------------------------------------------------------------ *
  * Nanocer design system
- * Soft lavender canvas · white cards · violet→indigo brand · pills.
+ * Warm cream canvas · white cards · flame-orange brand · charcoal ink.
+ * Palette: #fffcf2 #ccc5b9 #403d39 #252422 #eb5e28
  * ------------------------------------------------------------------ */
 
 :root {
-  --canvas: #f4f3fa;
+  --canvas: #fffcf2;
   --card: #ffffff;
-  --ink: #1a1924;
-  --muted: #74737f;
-  --border: #ececf3;
-  --brand: #7c3aed;
-  --brand-strong: #6d28d9;
-  --ring: rgba(124, 58, 237, 0.28);
+  --ink: #252422;
+  --muted: #6b665e;
+  --border: #e7e1d4;
+  --brand: #eb5e28;
+  --brand-strong: #c9481b;
+  --ring: rgba(235, 94, 40, 0.28);
   --radius: 1rem;
-  --shadow-sm: 0 1px 2px rgba(17, 12, 46, 0.04), 0 2px 8px rgba(17, 12, 46, 0.05);
-  --shadow-md: 0 8px 28px rgba(17, 12, 46, 0.08);
+  --shadow-sm: 0 1px 2px rgba(37, 36, 34, 0.05), 0 2px 8px rgba(37, 36, 34, 0.06);
+  --shadow-md: 0 8px 28px rgba(37, 36, 34, 0.10);
 
   --background: var(--canvas);
   --foreground: var(--ink);
@@ -56,9 +57,9 @@ body {
   .brand-gradient {
     background-image: linear-gradient(
       135deg,
-      #8b5cf6 0%,
-      #6d5cf0 45%,
-      #4f46e5 100%
+      #f5793a 0%,
+      #eb5e28 55%,
+      #cf4a1c 100%
     );
   }
   .brand-text {
@@ -136,11 +137,11 @@ body {
   }
   .btn-primary {
     color: #fff;
-    background-image: linear-gradient(135deg, #8b5cf6, #5b53e8);
-    box-shadow: 0 6px 16px rgba(99, 72, 235, 0.3);
+    background-image: linear-gradient(135deg, #f5793a, #d24e1d);
+    box-shadow: 0 6px 16px rgba(235, 94, 40, 0.3);
   }
   .btn-primary:hover:not(:disabled) {
-    box-shadow: 0 9px 22px rgba(99, 72, 235, 0.42);
+    box-shadow: 0 9px 22px rgba(235, 94, 40, 0.42);
   }
   .btn-secondary {
     background: #fff;
@@ -148,8 +149,8 @@ body {
     color: var(--ink);
   }
   .btn-secondary:hover:not(:disabled) {
-    background: #faf9ff;
-    border-color: #ddd8f6;
+    background: #fbf6ee;
+    border-color: #e0d8c8;
   }
   .btn-danger {
     background: #fff;

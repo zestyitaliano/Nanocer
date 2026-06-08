@@ -98,7 +98,7 @@ export default function QuizEditor({
           type="checkbox"
           checked={draft.enabled}
           onChange={(e) => update({ ...draft, enabled: e.target.checked })}
-          className="accent-violet-600 w-4 h-4"
+          className="accent-orange-600 w-4 h-4"
         />
         Floor-plan finder (questionnaire)
       </label>
@@ -126,7 +126,7 @@ export default function QuizEditor({
           </div>
 
           {planTagHints.length > 0 && (
-            <div className="text-[11px] text-[var(--muted)] bg-violet-50 rounded-lg px-3 py-2">
+            <div className="text-[11px] text-[var(--muted)] bg-orange-50 rounded-lg px-3 py-2">
               <span className="font-medium">Your plans &amp; tags</span> — use these
               tags in answers to steer the match:
               <ul className="mt-1 space-y-0.5">

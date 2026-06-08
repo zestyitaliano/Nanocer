@@ -40,7 +40,7 @@ function PlanCard({ plan, accent }: { plan: FloorPlan; accent: string }) {
   return (
     <div
       id={`fp-${plan.id}`}
-      className="border border-[var(--border)] rounded-2xl overflow-hidden shadow-sm scroll-mt-4 target:ring-2 target:ring-violet-400"
+      className="border border-[var(--border)] rounded-2xl overflow-hidden shadow-sm scroll-mt-4 target:ring-2 target:ring-orange-400"
     >
       <Gallery
         images={plan.photos?.length ? plan.photos : plan.photo_url ? [plan.photo_url] : []}
@@ -167,7 +167,7 @@ export default async function PropertyPage({
   if (!l) notFound();
 
   const cfg = (l.page_config ?? {}) as PageConfig;
-  const accent = cfg.theme?.color || "#1a73e8";
+  const accent = cfg.theme?.color || "#eb5e28";
 
   // Non-property templates render their own layout (and skip the plans fetch).
   const template = (l.template as PageTemplate) || "property";

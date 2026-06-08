@@ -9,7 +9,7 @@ export default function Home() {
         className="pointer-events-none fixed inset-0 -z-10"
         style={{
           background:
-            "radial-gradient(60rem 40rem at 50% -10%, rgba(124,58,237,0.16), transparent 60%), radial-gradient(40rem 30rem at 90% 110%, rgba(79,70,229,0.12), transparent 60%)",
+            "radial-gradient(60rem 40rem at 50% -10%, rgba(235, 94, 40,0.16), transparent 60%), radial-gradient(40rem 30rem at 90% 110%, rgba(207, 74, 28,0.12), transparent 60%)",
         }}
       />
       <div className="max-w-xl text-center space-y-7">

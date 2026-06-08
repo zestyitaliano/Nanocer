@@ -59,7 +59,7 @@ function Breakdown({ rows }: { rows: { label: string; n: number }[] }) {
         <div key={r.label} className="flex items-center gap-2 text-sm">
           <span className="w-24 truncate text-[var(--muted)]">{r.label}</span>
           <div className="flex-1 h-2 rounded-full bg-neutral-100 overflow-hidden">
-            <div className="h-full bg-violet-400 rounded-full" style={{ width: `${(r.n / total) * 100}%` }} />
+            <div className="h-full bg-orange-400 rounded-full" style={{ width: `${(r.n / total) * 100}%` }} />
           </div>
           <span className="w-8 text-right tabular-nums">{r.n}</span>
         </div>
@@ -214,7 +214,7 @@ export default function ListingAnalytics({
 
       <div className="card p-4">
         <div className="text-sm font-semibold mb-2">Scans · last {DAYS} days</div>
-        <Bars series={scanSeries} color="#7c5cff" />
+        <Bars series={scanSeries} color="#eb5e28" />
       </div>
 
       <div className="card p-4">

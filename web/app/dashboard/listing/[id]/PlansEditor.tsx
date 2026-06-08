@@ -306,7 +306,7 @@ export default function PlansEditor({
                   </button>
                 </div>
               ))}
-              <label className="w-14 h-14 border border-dashed border-violet-300 bg-violet-50/50 rounded-lg flex items-center justify-center text-violet-400 text-xl cursor-pointer hover:bg-violet-50 transition">
+              <label className="w-14 h-14 border border-dashed border-orange-300 bg-orange-50/50 rounded-lg flex items-center justify-center text-orange-400 text-xl cursor-pointer hover:bg-orange-50 transition">
                 +
                 <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => addPhotos(p.id, e)} />
               </label>

@@ -82,7 +82,7 @@ export default function PropertyQuiz({
   listingId,
   quiz,
   plans,
-  accent = "#1a73e8",
+  accent = "#eb5e28",
 }: {
   listingId: string;
   quiz: QuizConfig;
@@ -160,7 +160,7 @@ export default function PropertyQuiz({
             <button
               key={o.id}
               onClick={() => choose(q.id, o.id)}
-              className="w-full text-left border border-[var(--border)] rounded-xl px-3 py-3 text-sm hover:border-violet-400 hover:bg-violet-50/40 transition"
+              className="w-full text-left border border-[var(--border)] rounded-xl px-3 py-3 text-sm hover:border-orange-400 hover:bg-orange-50/40 transition"
             >
               {o.label}
             </button>
