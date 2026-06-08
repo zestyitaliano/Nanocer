@@ -5,7 +5,9 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Listing, PageConfig } from "@/lib/types";
+import { quizIsLive } from "@/lib/quiz";
 import LeadForm from "./LeadForm";
+import PropertyQuiz from "./PropertyQuiz";
 
 export const dynamic = "force-dynamic";
 
@@ -58,6 +60,7 @@ export default async function PropertyPage({
   const photos = cfg.photos ?? [];
   const agent = cfg.agent ?? {};
   const cta = cfg.cta;
+  const showQuiz = quizIsLive(cfg.quiz);
   const mapHref = l.address
     ? `https://maps.google.com/?q=${encodeURIComponent(l.address)}`
     : null;
@@ -133,8 +136,14 @@ export default async function PropertyPage({
           )}
 
           <div className="border-t pt-4">
-            <h2 className="text-sm font-medium mb-2">Request a tour</h2>
-            <LeadForm listingId={l.id} accent={accent} />
+            {showQuiz ? (
+              <PropertyQuiz listingId={l.id} quiz={cfg.quiz!} accent={accent} />
+            ) : (
+              <>
+                <h2 className="text-sm font-medium mb-2">Request a tour</h2>
+                <LeadForm listingId={l.id} accent={accent} />
+              </>
+            )}
           </div>
 
           <p className="text-center text-[11px] text-neutral-400 pt-2">

@@ -59,12 +59,59 @@ export const STATUS_LABEL: Record<ListingStatus, string> = {
   other: "Other",
 };
 
+// A call-to-action button. Shared by the page CTA, plan cards, and the quiz.
+export interface CtaConfig {
+  type: "tour" | "text" | "link";
+  label?: string;
+  value?: string;
+}
+
+// One selectable answer in a quiz question. `tags` are scored against each
+// FloorPlan's `tags` to pick the recommended plan(s).
+export interface QuizOption {
+  id: string;
+  label: string;
+  tags?: string[];
+}
+
+export interface QuizQuestion {
+  id: string;
+  label: string;
+  options: QuizOption[];
+}
+
+// A floor plan / unit a scanner can be routed to. All fields optional except a
+// name so it stays as light to author as a generic listing.
+export interface FloorPlan {
+  id: string;
+  name: string;
+  beds?: number | null;
+  baths?: number | null;
+  sqft?: number | null;
+  price?: number | null;
+  photo_url?: string;
+  description?: string;
+  tags?: string[];
+  cta?: CtaConfig;
+}
+
+// The "find your floor plan" questionnaire. Stored inside page_config (jsonb),
+// so adding/editing it needs no migration.
+export interface QuizConfig {
+  enabled?: boolean;
+  title?: string;
+  intro?: string;
+  questions?: QuizQuestion[];
+  plans?: FloorPlan[];
+}
+
 export interface PageConfig {
   photos?: string[];
   agent?: { name?: string; phone?: string; email?: string; photo_url?: string };
   // tour = show the lead form; text = sms link; link = external URL
-  cta?: { type: "tour" | "text" | "link"; label?: string; value?: string };
+  cta?: CtaConfig;
   theme?: { color?: string };
+  quiz?: QuizConfig;
 }
 
 export interface Lead {

@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { siteUrl } from "@/lib/api";
-import type { Listing, PageConfig } from "@/lib/types";
+import type { Listing, PageConfig, QuizConfig } from "@/lib/types";
+import QuizEditor from "./QuizEditor";
 
 function slugify(s: string): string {
   return s
@@ -35,6 +36,7 @@ export default function PageTab({
     cfg0.cta ?? { type: "tour" },
   );
   const [color, setColor] = useState(cfg0.theme?.color ?? "#1a73e8");
+  const [quiz, setQuiz] = useState<QuizConfig>(cfg0.quiz ?? {});
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -78,7 +80,7 @@ export default function PageTab({
   async function save() {
     setBusy(true);
     setMsg(null);
-    const page_config: PageConfig = { photos, agent, cta, theme: { color } };
+    const page_config: PageConfig = { photos, agent, cta, theme: { color }, quiz };
     const patch = {
       page_enabled: enabled,
       slug: enabled ? slug : listing.slug,
@@ -207,6 +209,12 @@ export default function PageTab({
         Accent color
         <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="h-8 w-12 border rounded" />
       </label>
+
+      <QuizEditor
+        initialQuiz={cfg0.quiz ?? {}}
+        onChange={setQuiz}
+        upload={(f) => upload(f)}
+      />
 
       <div className="flex items-center gap-3">
         <button onClick={save} disabled={busy} className="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-60">

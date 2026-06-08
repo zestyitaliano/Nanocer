@@ -6,9 +6,18 @@ import { submitLead } from "./actions";
 export default function LeadForm({
   listingId,
   accent = "#1a73e8",
+  label = "Request a tour",
+  busyLabel = "Sending…",
+  // Quiz context, when this form is rendered after the floor-plan finder.
+  recommendation,
+  quizSummary,
 }: {
   listingId: string;
   accent?: string;
+  label?: string;
+  busyLabel?: string;
+  recommendation?: string;
+  quizSummary?: string;
 }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -22,7 +31,15 @@ export default function LeadForm({
     e.preventDefault();
     setBusy(true);
     setErr(null);
-    const res = await submitLead({ listingId, name, phone, email, message });
+    const res = await submitLead({
+      listingId,
+      name,
+      phone,
+      email,
+      message,
+      recommendation,
+      quizSummary,
+    });
     setBusy(false);
     if (res.ok) setDone(true);
     else setErr(res.error ?? "Something went wrong.");
@@ -74,7 +91,7 @@ export default function LeadForm({
         style={{ background: accent }}
         className="w-full text-white rounded-lg py-2.5 text-sm font-medium disabled:opacity-60"
       >
-        {busy ? "Sending…" : "Request a tour"}
+        {busy ? busyLabel : label}
       </button>
     </form>
   );
