@@ -31,3 +31,7 @@ Thumbs.db
 # --- Source font library (full trial set lives at repo root; the app ships
 # only the subset copied into web/app/fonts/) ---
 /fonts/
+
+# --- Claude Code runtime (transient) ---
+.claude/scheduled_tasks.lock
+.claude/*.lock
