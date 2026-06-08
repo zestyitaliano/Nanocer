@@ -5,10 +5,15 @@ import { STATUS_LABEL, type Listing, type ListingStatus } from "@/lib/types";
 export const STATUS_COLOR: Record<ListingStatus, string> = {
   coming_soon: "bg-amber-100 text-amber-700",
   active: "bg-emerald-100 text-emerald-700",
-  under_contract: "bg-blue-100 text-blue-700",
-  sold: "bg-neutral-200 text-neutral-600",
+  leased_up: "bg-neutral-200 text-neutral-600",
   other: "bg-neutral-100 text-neutral-500",
 };
+
+// Tolerate any legacy status value (e.g. an old under_contract/sold row).
+export const statusColor = (s: string) =>
+  (STATUS_COLOR as Record<string, string>)[s] ?? STATUS_COLOR.other;
+export const statusLabelOf = (s: string) =>
+  (STATUS_LABEL as Record<string, string>)[s] ?? "Other";
 
 export default function ListingCard({
   listing,
@@ -37,8 +42,8 @@ export default function ListingCard({
     >
       <div className="flex items-start justify-between gap-2">
         <span className="font-semibold text-sm truncate">{label}</span>
-        <span className={`chip shrink-0 ${STATUS_COLOR[listing.status]}`}>
-          {STATUS_LABEL[listing.status]}
+        <span className={`chip shrink-0 ${statusColor(listing.status)}`}>
+          {statusLabelOf(listing.status)}
         </span>
       </div>
       {listing.name && listing.address && (

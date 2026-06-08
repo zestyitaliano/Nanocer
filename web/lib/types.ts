@@ -40,26 +40,22 @@ export interface QrCode {
   updated_at: string;
 }
 
-export type ListingStatus =
-  | "coming_soon"
-  | "active"
-  | "under_contract"
-  | "sold"
-  | "other";
+// Leasing-oriented statuses (multifamily/student ILS). Keys reuse the original
+// coming_soon/active/other so no data migration is needed; leased_up replaces the
+// old for-sale under_contract/sold.
+export type ListingStatus = "coming_soon" | "active" | "leased_up" | "other";
 
 export const LISTING_STATUSES: { value: ListingStatus; label: string }[] = [
-  { value: "coming_soon", label: "Coming soon" },
-  { value: "active", label: "Active" },
-  { value: "under_contract", label: "Under contract" },
-  { value: "sold", label: "Sold" },
+  { value: "coming_soon", label: "Pre-leasing" },
+  { value: "active", label: "Now leasing" },
+  { value: "leased_up", label: "Leased up" },
   { value: "other", label: "Other" },
 ];
 
 export const STATUS_LABEL: Record<ListingStatus, string> = {
-  coming_soon: "Coming soon",
-  active: "Active",
-  under_contract: "Under contract",
-  sold: "Sold",
+  coming_soon: "Pre-leasing",
+  active: "Now leasing",
+  leased_up: "Leased up",
   other: "Other",
 };
 

@@ -14,7 +14,7 @@ import {
   type QrCode,
 } from "@/lib/types";
 import { siteUrl } from "@/lib/api";
-import { STATUS_COLOR } from "@/components/ListingCard";
+import { statusColor } from "@/components/ListingCard";
 import QrThumb from "@/components/QrThumb";
 import PageTab from "./PageTab";
 import LeadsTab from "./LeadsTab";
@@ -147,7 +147,7 @@ export default function ListingHub({
           <select
             value={listing.status}
             onChange={(e) => setStatus(e.target.value as ListingStatus)}
-            className={`chip border-0 cursor-pointer ${STATUS_COLOR[listing.status]}`}
+            className={`chip border-0 cursor-pointer ${statusColor(listing.status)}`}
           >
             {LISTING_STATUSES.map((s) => (
               <option key={s.value} value={s.value}>

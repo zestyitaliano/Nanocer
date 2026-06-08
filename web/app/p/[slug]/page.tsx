@@ -188,13 +188,11 @@ export default async function PropertyPage({
     ? `https://maps.google.com/?q=${encodeURIComponent(l.address)}`
     : null;
   const statusBanner: { text: string; cls: string } | null =
-    l.status === "under_contract"
-      ? { text: "Under contract", cls: "bg-amber-100 text-amber-800" }
-      : l.status === "sold"
-        ? { text: "No longer available", cls: "bg-neutral-200 text-neutral-700" }
-        : l.status === "coming_soon"
-          ? { text: "Coming soon", cls: "bg-blue-100 text-blue-800" }
-          : null;
+    l.status === "leased_up"
+      ? { text: "Leased up", cls: "bg-neutral-200 text-neutral-700" }
+      : l.status === "coming_soon"
+        ? { text: "Pre-leasing", cls: "bg-amber-100 text-amber-800" }
+        : null;
 
   return (
     <main className="min-h-screen sm:py-6">

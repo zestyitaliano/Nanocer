@@ -21,8 +21,7 @@ const STATUS_DOT: Record<StatusFilter, string> = {
   all: "bg-violet-500",
   coming_soon: "bg-amber-400",
   active: "bg-emerald-500",
-  under_contract: "bg-blue-500",
-  sold: "bg-neutral-400",
+  leased_up: "bg-neutral-400",
   other: "bg-neutral-300",
 };
 
