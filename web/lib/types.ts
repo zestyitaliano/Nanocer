@@ -143,7 +143,19 @@ export interface PageConfig {
   plans?: FloorPlan[];
   property_type?: PropertyType;
   quiz?: QuizConfig;
+  // Template-specific config (see listing.template).
+  event?: { date?: string; time?: string; note?: string }; // open_house
+  coming_soon?: { expected?: string; blurb?: string };
 }
+
+export type PageTemplate = "property" | "agent" | "open_house" | "coming_soon";
+
+export const PAGE_TEMPLATES: { value: PageTemplate; label: string }[] = [
+  { value: "property", label: "Property (floor plans + finder)" },
+  { value: "agent", label: "Agent card / link-in-bio" },
+  { value: "open_house", label: "Open house / tour sign-in" },
+  { value: "coming_soon", label: "Coming soon / waitlist" },
+];
 
 export interface Lead {
   id: number;

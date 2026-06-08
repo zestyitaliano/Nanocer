@@ -4,8 +4,9 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { FloorPlan, Listing, PageConfig } from "@/lib/types";
+import type { FloorPlan, Listing, PageConfig, PageTemplate } from "@/lib/types";
 import { quizIsLive } from "@/lib/quiz";
+import { AgentTemplate, OpenHouseTemplate, ComingSoonTemplate } from "./templates";
 import {
   planPriceLabel,
   summaryRange,
@@ -166,6 +167,16 @@ export default async function PropertyPage({
 
   const cfg = (l.page_config ?? {}) as PageConfig;
   const accent = cfg.theme?.color || "#1a73e8";
+
+  // Non-property templates render their own layout (and skip the plans fetch).
+  const template = (l.template as PageTemplate) || "property";
+  if (template === "agent")
+    return <AgentTemplate listing={l} cfg={cfg} accent={accent} />;
+  if (template === "open_house")
+    return <OpenHouseTemplate listing={l} cfg={cfg} accent={accent} />;
+  if (template === "coming_soon")
+    return <ComingSoonTemplate listing={l} cfg={cfg} accent={accent} />;
+
   const title = l.address || l.name || "Property";
   const photos = cfg.photos ?? [];
   const agent = cfg.agent ?? {};

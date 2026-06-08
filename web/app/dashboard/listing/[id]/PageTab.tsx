@@ -7,10 +7,11 @@ import type {
   FloorPlan,
   Listing,
   PageConfig,
+  PageTemplate,
   PropertyType,
   QuizConfig,
 } from "@/lib/types";
-import { PROPERTY_TYPES } from "@/lib/types";
+import { PROPERTY_TYPES, PAGE_TEMPLATES } from "@/lib/types";
 import PlansEditor from "./PlansEditor";
 import QuizEditor from "./QuizEditor";
 
@@ -51,6 +52,11 @@ export default function PageTab({
   const [propertyType, setPropertyType] = useState<PropertyType>(
     cfg0.property_type ?? "multifamily",
   );
+  const [template, setTemplate] = useState<PageTemplate>(
+    (listing.template as PageTemplate) || "property",
+  );
+  const [event, setEvent] = useState(cfg0.event ?? {});
+  const [comingSoon, setComingSoon] = useState(cfg0.coming_soon ?? {});
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -100,13 +106,15 @@ export default function PageTab({
       cta,
       theme: { color },
       property_type: propertyType,
+      event,
+      coming_soon: comingSoon,
       // Plans live in the floor_plans table now; keep quiz questions only.
       quiz: { ...quiz, plans: undefined },
     };
     const patch = {
       page_enabled: enabled,
       slug: enabled ? slug : listing.slug,
-      template: "property",
+      template,
       page_config,
     };
     const { error } = await supabase.from("listings").update(patch).eq("id", listing.id);
@@ -136,19 +144,66 @@ export default function PageTab({
       </label>
 
       <label className="block">
-        <span className="text-xs text-[var(--muted)]">Property type</span>
+        <span className="text-xs text-[var(--muted)]">Page template</span>
         <select
-          value={propertyType}
-          onChange={(e) => setPropertyType(e.target.value as PropertyType)}
+          value={template}
+          onChange={(e) => setTemplate(e.target.value as PageTemplate)}
           className="input w-full mt-1"
         >
-          {PROPERTY_TYPES.map((t) => (
+          {PAGE_TEMPLATES.map((t) => (
             <option key={t.value} value={t.value}>
               {t.label}
             </option>
           ))}
         </select>
       </label>
+
+      {template === "property" && (
+        <label className="block">
+          <span className="text-xs text-[var(--muted)]">Property type</span>
+          <select
+            value={propertyType}
+            onChange={(e) => setPropertyType(e.target.value as PropertyType)}
+            className="input w-full mt-1"
+          >
+            {PROPERTY_TYPES.map((t) => (
+              <option key={t.value} value={t.value}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+
+      {template === "open_house" && (
+        <div className="grid grid-cols-2 gap-2">
+          <label className="block">
+            <span className="text-xs text-[var(--muted)]">Date</span>
+            <input value={event.date ?? ""} onChange={(e) => setEvent({ ...event, date: e.target.value })} placeholder="Sat, Jun 14" className="input w-full mt-1" />
+          </label>
+          <label className="block">
+            <span className="text-xs text-[var(--muted)]">Time</span>
+            <input value={event.time ?? ""} onChange={(e) => setEvent({ ...event, time: e.target.value })} placeholder="1–4 PM" className="input w-full mt-1" />
+          </label>
+          <label className="block col-span-2">
+            <span className="text-xs text-[var(--muted)]">Note (optional)</span>
+            <input value={event.note ?? ""} onChange={(e) => setEvent({ ...event, note: e.target.value })} placeholder="Refreshments provided · park on Oak St" className="input w-full mt-1" />
+          </label>
+        </div>
+      )}
+
+      {template === "coming_soon" && (
+        <div className="space-y-2">
+          <label className="block">
+            <span className="text-xs text-[var(--muted)]">Expected availability</span>
+            <input value={comingSoon.expected ?? ""} onChange={(e) => setComingSoon({ ...comingSoon, expected: e.target.value })} placeholder="Fall 2026" className="input w-full mt-1" />
+          </label>
+          <label className="block">
+            <span className="text-xs text-[var(--muted)]">Blurb (optional)</span>
+            <textarea value={comingSoon.blurb ?? ""} onChange={(e) => setComingSoon({ ...comingSoon, blurb: e.target.value })} rows={2} className="input w-full mt-1" />
+          </label>
+        </div>
+      )}
 
       <label className="block">
         <span className="text-xs text-[var(--muted)]">Page URL</span>
@@ -248,15 +303,19 @@ export default function PageTab({
         <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="h-9 w-12 border border-[var(--border)] rounded-lg cursor-pointer" />
       </label>
 
-      <PlansEditor
-        listingId={listing.id}
-        userId={userId}
-        initialPlans={initialPlans}
-        onChange={setPlans}
-        upload={(f) => upload(f)}
-      />
+      {template === "property" && (
+        <>
+          <PlansEditor
+            listingId={listing.id}
+            userId={userId}
+            initialPlans={initialPlans}
+            onChange={setPlans}
+            upload={(f) => upload(f)}
+          />
 
-      <QuizEditor initialQuiz={cfg0.quiz ?? {}} plans={plans} onChange={setQuiz} />
+          <QuizEditor initialQuiz={cfg0.quiz ?? {}} plans={plans} onChange={setQuiz} />
+        </>
+      )}
 
       <div className="flex items-center gap-3">
         <button onClick={save} disabled={busy} className="btn btn-primary">
