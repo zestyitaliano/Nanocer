@@ -1,13 +1,6 @@
-// Helpers for first-class floor plans (units) on a listing's page config.
-import type { FloorPlan, PageConfig } from "./types";
-
-// Plans now live at page_config.plans; older configs authored them inside the
-// quiz. Read the new location first, fall back to the quiz for backward compat.
-export function getPlans(cfg: PageConfig | null | undefined): FloorPlan[] {
-  if (!cfg) return [];
-  if (cfg.plans && cfg.plans.length) return cfg.plans;
-  return cfg.quiz?.plans ?? [];
-}
+// Display helpers for floor plans (units). Plans are fetched from the
+// floor_plans table and passed in as FloorPlan[].
+import type { FloorPlan } from "./types";
 
 const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
 

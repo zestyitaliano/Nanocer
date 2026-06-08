@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import CodeEditor from "@/components/CodeEditor";
-import type { QrCode } from "@/lib/types";
+import type { FloorPlan, QrCode } from "@/lib/types";
 
 export type ListingOption = {
   id: string;
@@ -17,10 +17,12 @@ export type ListingOption = {
 export default function EditorView({
   code,
   listings,
+  floorPlans,
   userId,
 }: {
   code: QrCode;
   listings: ListingOption[];
+  floorPlans: FloorPlan[];
   userId: string;
 }) {
   const router = useRouter();
@@ -75,6 +77,7 @@ export default function EditorView({
             code={code}
             userId={userId}
             listing={listings.find((l) => l.id === listingId) ?? null}
+            floorPlans={floorPlans}
             onSaved={() => router.refresh()}
             onDeleted={back}
           />

@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import EditorView, { type ListingOption } from "./EditorView";
-import type { QrCode } from "@/lib/types";
+import type { FloorPlan, QrCode } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -26,10 +26,23 @@ export default async function EditorPage({
   ]);
   if (!code) notFound(); // RLS also hides other users' codes
 
+  // The code's listing's floor plans (for the "specific floor plan" target).
+  let floorPlans: FloorPlan[] = [];
+  const listingId = (code as QrCode).listing_id;
+  if (listingId) {
+    const { data: plans } = await supabase
+      .from("floor_plans")
+      .select("*")
+      .eq("listing_id", listingId)
+      .order("sort_order", { ascending: true });
+    floorPlans = (plans ?? []) as FloorPlan[];
+  }
+
   return (
     <EditorView
       code={code as QrCode}
       listings={(listings ?? []) as ListingOption[]}
+      floorPlans={floorPlans}
       userId={user.id}
     />
   );

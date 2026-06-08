@@ -32,8 +32,10 @@ export interface QrCode {
   style: QrStyle;
   scan_count: number;
   listing_id: string | null;
-  // 'url' = fixed destination; 'listing_page' = resolve to its listing's page
-  target_mode: "url" | "listing_page";
+  floor_plan_id: string | null;
+  // 'url' = fixed destination; 'listing_page' = the listing's page;
+  // 'floor_plan' = the listing's page anchored to a specific unit
+  target_mode: "url" | "listing_page" | "floor_plan";
   created_at: string;
   updated_at: string;
 }
@@ -84,11 +86,15 @@ export interface QuizQuestion {
 
 export type PlanAvailability = "available" | "waitlist" | "unavailable";
 
-// A floor plan / unit. First-class for multifamily & student housing: a
-// community lists several. All fields optional except a name so it stays light.
+// A floor plan / unit — now a first-class DB row (table: floor_plans). A
+// community lists several; a QR code can target one for per-unit scan analytics.
 export interface FloorPlan {
   id: string;
+  listing_id: string;
   name: string;
+  sort_order?: number;
+  created_at?: string;
+  updated_at?: string;
   beds?: number | null;
   baths?: number | null;
   sqft?: number | null;

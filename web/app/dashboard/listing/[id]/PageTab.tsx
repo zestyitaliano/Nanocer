@@ -11,7 +11,6 @@ import type {
   QuizConfig,
 } from "@/lib/types";
 import { PROPERTY_TYPES } from "@/lib/types";
-import { getPlans } from "@/lib/listing";
 import PlansEditor from "./PlansEditor";
 import QuizEditor from "./QuizEditor";
 
@@ -27,10 +26,12 @@ function slugify(s: string): string {
 export default function PageTab({
   listing,
   userId,
+  initialPlans,
   onSaved,
 }: {
   listing: Listing;
   userId: string;
+  initialPlans: FloorPlan[];
   onSaved: (patch: Partial<Listing>) => void;
 }) {
   const supabase = createClient();
@@ -46,7 +47,7 @@ export default function PageTab({
   );
   const [color, setColor] = useState(cfg0.theme?.color ?? "#1a73e8");
   const [quiz, setQuiz] = useState<QuizConfig>(cfg0.quiz ?? {});
-  const [plans, setPlans] = useState<FloorPlan[]>(getPlans(cfg0));
+  const [plans, setPlans] = useState<FloorPlan[]>(initialPlans);
   const [propertyType, setPropertyType] = useState<PropertyType>(
     cfg0.property_type ?? "multifamily",
   );
@@ -98,9 +99,8 @@ export default function PageTab({
       agent,
       cta,
       theme: { color },
-      plans,
       property_type: propertyType,
-      // Plans live top-level now; strip any legacy quiz.plans.
+      // Plans live in the floor_plans table now; keep quiz questions only.
       quiz: { ...quiz, plans: undefined },
     };
     const patch = {
@@ -249,7 +249,9 @@ export default function PageTab({
       </label>
 
       <PlansEditor
-        initialPlans={getPlans(cfg0)}
+        listingId={listing.id}
+        userId={userId}
+        initialPlans={initialPlans}
         onChange={setPlans}
         upload={(f) => upload(f)}
       />

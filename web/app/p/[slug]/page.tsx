@@ -7,13 +7,22 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import type { FloorPlan, Listing, PageConfig } from "@/lib/types";
 import { quizIsLive } from "@/lib/quiz";
 import {
-  getPlans,
   planPriceLabel,
   summaryRange,
   AVAILABILITY_BADGE,
 } from "@/lib/listing";
 import LeadForm from "./LeadForm";
 import PropertyQuiz from "./PropertyQuiz";
+
+async function getFloorPlans(listingId: string): Promise<FloorPlan[]> {
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("floor_plans")
+    .select("*")
+    .eq("listing_id", listingId)
+    .order("sort_order", { ascending: true });
+  return (data as FloorPlan[]) ?? [];
+}
 
 function PlanCard({ plan, accent }: { plan: FloorPlan; accent: string }) {
   const price = planPriceLabel(plan);
@@ -27,7 +36,10 @@ function PlanCard({ plan, accent }: { plan: FloorPlan; accent: string }) {
   const badge = AVAILABILITY_BADGE[plan.availability ?? "available"];
   const cta = plan.cta;
   return (
-    <div className="border border-[var(--border)] rounded-2xl overflow-hidden shadow-sm">
+    <div
+      id={`fp-${plan.id}`}
+      className="border border-[var(--border)] rounded-2xl overflow-hidden shadow-sm scroll-mt-4 target:ring-2 target:ring-violet-400"
+    >
       {plan.photo_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={plan.photo_url} alt={plan.name} className="w-full aspect-[4/3] object-cover" />
@@ -158,7 +170,7 @@ export default async function PropertyPage({
   const photos = cfg.photos ?? [];
   const agent = cfg.agent ?? {};
   const cta = cfg.cta;
-  const plans = getPlans(cfg);
+  const plans = await getFloorPlans(l.id);
   const showQuiz = quizIsLive(cfg.quiz, plans.length);
   const mapHref = l.address
     ? `https://maps.google.com/?q=${encodeURIComponent(l.address)}`

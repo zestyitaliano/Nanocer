@@ -6,7 +6,7 @@
 // through codes) and leads (owner-readable via RLS through the listing).
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { Lead, QrCode } from "@/lib/types";
+import type { FloorPlan, Lead, QrCode } from "@/lib/types";
 
 const DAYS = 30;
 
@@ -71,9 +71,11 @@ function Breakdown({ rows }: { rows: { label: string; n: number }[] }) {
 export default function ListingAnalytics({
   listingId,
   codes,
+  plans = [],
 }: {
   listingId: string;
   codes: QrCode[];
+  plans?: FloorPlan[];
 }) {
   const supabase = createClient();
   const [scans, setScans] = useState<ScanRow[]>([]);
@@ -136,6 +138,19 @@ export default function ListingAnalytics({
         .slice(0, 8),
     [codes],
   );
+
+  // True per-unit scans: sum scans of codes that target each floor plan.
+  const planScans = useMemo(() => {
+    const byPlan: Record<string, number> = {};
+    for (const c of codes) {
+      if (c.floor_plan_id) {
+        byPlan[c.floor_plan_id] = (byPlan[c.floor_plan_id] ?? 0) + (c.scan_count ?? 0);
+      }
+    }
+    return plans
+      .map((p) => ({ label: p.name || "(unnamed plan)", n: byPlan[p.id] ?? 0 }))
+      .sort((a, b) => b.n - a.n);
+  }, [codes, plans]);
 
   const sources = useMemo(() => {
     const m: Record<string, number> = {};
@@ -225,6 +240,16 @@ export default function ListingAnalytics({
           <Breakdown rows={devices} />
         </div>
       </div>
+
+      {planScans.length > 0 && (
+        <div className="card p-4">
+          <div className="text-sm font-semibold mb-1">Scans by floor plan</div>
+          <p className="text-xs text-[var(--muted)] mb-3">
+            Scans from QR codes that target each unit (per-unit attribution).
+          </p>
+          <Breakdown rows={planScans} />
+        </div>
+      )}
 
       {planInterest.length > 0 && (
         <div className="card p-4">

@@ -8,6 +8,7 @@ import {
   DEFAULT_STYLE,
   LISTING_STATUSES,
   encodedValue,
+  type FloorPlan,
   type Listing,
   type ListingStatus,
   type QrCode,
@@ -24,10 +25,12 @@ type Tab = "overview" | "codes" | "page" | "leads" | "analytics";
 export default function ListingHub({
   listing: initial,
   initialCodes,
+  initialFloorPlans,
   userId,
 }: {
   listing: Listing;
   initialCodes: QrCode[];
+  initialFloorPlans: FloorPlan[];
   userId: string;
 }) {
   const supabase = createClient();
@@ -277,6 +280,7 @@ export default function ListingHub({
           <PageTab
             listing={listing}
             userId={userId}
+            initialPlans={initialFloorPlans}
             onSaved={(patch) => setListing((l) => ({ ...l, ...patch }))}
           />
         )}
@@ -284,7 +288,11 @@ export default function ListingHub({
         {tab === "leads" && <LeadsTab listingId={listing.id} />}
 
         {tab === "analytics" && (
-          <ListingAnalytics listingId={listing.id} codes={codes} />
+          <ListingAnalytics
+            listingId={listing.id}
+            codes={codes}
+            plans={initialFloorPlans}
+          />
         )}
       </div>
     </main>

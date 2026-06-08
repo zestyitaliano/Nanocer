@@ -6,6 +6,7 @@ import {
   DEFAULT_STYLE,
   MODULE_STYLES,
   encodedValue,
+  type FloorPlan,
   type QrCode,
   type QrStyle,
 } from "@/lib/types";
@@ -26,12 +27,14 @@ export default function CodeEditor({
   code,
   userId,
   listing,
+  floorPlans = [],
   onSaved,
   onDeleted,
 }: {
   code: QrCode;
   userId: string;
   listing?: EditorListing | null;
+  floorPlans?: FloorPlan[];
   onSaved: (c: QrCode) => void;
   onDeleted: (id: string) => void;
 }) {
@@ -39,8 +42,11 @@ export default function CodeEditor({
   const [title, setTitle] = useState(code.title);
   const [isDynamic, setIsDynamic] = useState(code.is_dynamic);
   const [destination, setDestination] = useState(code.destination);
-  const [targetMode, setTargetMode] = useState<"url" | "listing_page">(
-    code.target_mode,
+  const [targetMode, setTargetMode] = useState<
+    "url" | "listing_page" | "floor_plan"
+  >(code.target_mode);
+  const [floorPlanId, setFloorPlanId] = useState<string | null>(
+    code.floor_plan_id,
   );
   const [content, setContent] = useState(code.content);
   const [style, setStyle] = useState<QrStyle>({ ...DEFAULT_STYLE, ...code.style });
@@ -54,6 +60,7 @@ export default function CodeEditor({
     setIsDynamic(code.is_dynamic);
     setDestination(code.destination);
     setTargetMode(code.target_mode);
+    setFloorPlanId(code.floor_plan_id);
     setContent(code.content);
     setStyle({ ...DEFAULT_STYLE, ...code.style });
     setMsg(null);
@@ -79,6 +86,7 @@ export default function CodeEditor({
         content,
         style,
         target_mode: targetMode,
+        floor_plan_id: targetMode === "floor_plan" ? floorPlanId : null,
       })
       .eq("id", code.id)
       .select()
@@ -177,37 +185,33 @@ export default function CodeEditor({
         {isDynamic ? (
           <div className="space-y-2">
             {listing && (
-              <div className="flex gap-2 text-sm">
-                <label
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition flex-1 ${
-                    targetMode === "listing_page"
-                      ? "border-violet-300 bg-violet-50 text-violet-700"
-                      : "border-[var(--border)] text-[var(--muted)]"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    checked={targetMode === "listing_page"}
-                    onChange={() => setTargetMode("listing_page")}
-                    className="accent-violet-600"
-                  />
-                  Property page
-                </label>
-                <label
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition flex-1 ${
-                    targetMode === "url"
-                      ? "border-violet-300 bg-violet-50 text-violet-700"
-                      : "border-[var(--border)] text-[var(--muted)]"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    checked={targetMode === "url"}
-                    onChange={() => setTargetMode("url")}
-                    className="accent-violet-600"
-                  />
-                  Custom URL
-                </label>
+              <div className="flex flex-wrap gap-2 text-sm">
+                {(
+                  [
+                    ["listing_page", "Property page"],
+                    ...(floorPlans.length
+                      ? ([["floor_plan", "Specific floor plan"]] as const)
+                      : []),
+                    ["url", "Custom URL"],
+                  ] as const
+                ).map(([mode, label]) => (
+                  <label
+                    key={mode}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition ${
+                      targetMode === mode
+                        ? "border-violet-300 bg-violet-50 text-violet-700"
+                        : "border-[var(--border)] text-[var(--muted)]"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      checked={targetMode === mode}
+                      onChange={() => setTargetMode(mode)}
+                      className="accent-violet-600"
+                    />
+                    {label}
+                  </label>
+                ))}
               </div>
             )}
 
@@ -240,6 +244,32 @@ export default function CodeEditor({
                   </>
                 )}
               </>
+            ) : listing && targetMode === "floor_plan" ? (
+              <div className="space-y-1.5">
+                <select
+                  value={floorPlanId ?? ""}
+                  onChange={(e) => setFloorPlanId(e.target.value || null)}
+                  className="input w-full"
+                >
+                  <option value="">Select a floor plan…</option>
+                  {floorPlans.map((fp) => (
+                    <option key={fp.id} value={fp.id}>
+                      {fp.name || "(unnamed plan)"}
+                    </option>
+                  ))}
+                </select>
+                {listing.page_enabled && listing.slug ? (
+                  <p className="text-[11px] text-[var(--muted)] bg-violet-50 rounded-lg px-3 py-2">
+                    Lands on this plan&apos;s section of{" "}
+                    <span className="font-medium">/p/{listing.slug}</span> and
+                    counts as a scan for the plan (per-unit analytics).
+                  </p>
+                ) : (
+                  <p className="text-[11px] text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
+                    Publish this listing&apos;s page (Page tab) to activate.
+                  </p>
+                )}
+              </div>
             ) : (
               <label className="block">
                 <span className="text-xs text-[var(--muted)]">Destination URL</span>
