@@ -17,6 +17,7 @@ import { STATUS_COLOR } from "@/components/ListingCard";
 import QrThumb from "@/components/QrThumb";
 import PageTab from "./PageTab";
 import LeadsTab from "./LeadsTab";
+import ListingAnalytics from "./ListingAnalytics";
 
 type Tab = "overview" | "codes" | "page" | "leads" | "analytics";
 
@@ -283,9 +284,7 @@ export default function ListingHub({
         {tab === "leads" && <LeadsTab listingId={listing.id} />}
 
         {tab === "analytics" && (
-          <div className="card text-center text-[var(--muted)] text-sm py-16">
-            Per-listing analytics — coming soon.
-          </div>
+          <ListingAnalytics listingId={listing.id} codes={codes} />
         )}
       </div>
     </main>
