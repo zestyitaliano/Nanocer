@@ -1,30 +1,19 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { DM_Sans, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-// PP Frama — headline / display face.
-const frama = localFont({
-  src: [
-    { path: "./fonts/PPFrama-Extralight.otf", weight: "200", style: "normal" },
-    { path: "./fonts/PPFrama-Regular.otf", weight: "400", style: "normal" },
-    { path: "./fonts/PPFrama-RegularItalic.otf", weight: "400", style: "italic" },
-    { path: "./fonts/PPFrama-Black.otf", weight: "900", style: "normal" },
-  ],
-  variable: "--font-frama",
+// DM Sans — body + UI + headlines. Geist Mono — monospace accent (codes, stats).
+// Both are open-licensed (OFL) Google fonts, self-hosted by Next at build time
+// (no runtime Google requests, no licensed font files in the repo).
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
   display: "swap",
 });
 
-// GT Pressura — body + accent face (used for everything else, incl. UI controls).
-const pressura = localFont({
-  src: [
-    { path: "./fonts/GTPressura-Light.woff2", weight: "300", style: "normal" },
-    { path: "./fonts/GTPressura-Regular.woff2", weight: "400", style: "normal" },
-    { path: "./fonts/GTPressura-RegularItalic.woff2", weight: "400", style: "italic" },
-    { path: "./fonts/GTPressura-Medium.woff2", weight: "500", style: "normal" },
-    { path: "./fonts/GTPressura-Bold.woff2", weight: "700", style: "normal" },
-    { path: "./fonts/GTPressura-Black.woff2", weight: "900", style: "normal" },
-  ],
-  variable: "--font-pressura",
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
   display: "swap",
 });
 
@@ -42,7 +31,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${frama.variable} ${pressura.variable} h-full antialiased`}
+      className={`${dmSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

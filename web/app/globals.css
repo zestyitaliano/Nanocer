@@ -26,38 +26,29 @@
   --color-background: var(--canvas);
   --color-foreground: var(--ink);
   --color-brand: var(--brand);
-  /* GT Pressura drives body + UI; PP Frama is the display/headline face. */
-  --font-sans: var(--font-pressura);
-  --font-display: var(--font-frama);
+  /* DM Sans drives body + UI + headlines; Geist Mono is the monospace accent. */
+  --font-sans: var(--font-dm-sans);
+  --font-display: var(--font-dm-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 body {
   background: var(--canvas);
   color: var(--ink);
-  font-family: var(--font-pressura), ui-sans-serif, system-ui, -apple-system,
+  font-family: var(--font-dm-sans), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Headlines use PP Frama. */
+/* Headlines use DM Sans (bold/tight for a modern display look); component
+ * Tailwind weight classes (font-bold/semibold) apply normally. */
 @layer base {
   h1,
   h2,
   h3 {
-    font-family: var(--font-frama), Georgia, "Times New Roman", serif;
+    font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.015em;
   }
-}
-
-/* PP Frama renders much heavier and tighter than Geist did at the same weight
- * classes (it only ships Regular and Black, so font-bold fell back to Black).
- * Pin the display face to Regular and loosen the tracking. Written unlayered
- * so it wins over Tailwind's layered font-weight/tracking utilities. */
-h1,
-h2,
-h3,
-.font-display {
-  font-weight: 400;
-  letter-spacing: 0.015em;
 }
 
 @layer components {
@@ -74,7 +65,10 @@ h3,
     color: var(--brand-strong);
   }
   .font-display {
-    font-family: var(--font-frama), Georgia, "Times New Roman", serif;
+    font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  }
+  .font-mono {
+    font-family: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
   }
 
   /* Cards ---------------------------------------------------------- */
