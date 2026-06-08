@@ -82,19 +82,25 @@ export interface QuizQuestion {
   options: QuizOption[];
 }
 
-// A floor plan / unit a scanner can be routed to. All fields optional except a
-// name so it stays as light to author as a generic listing.
+export type PlanAvailability = "available" | "waitlist" | "unavailable";
+
+// A floor plan / unit. First-class for multifamily & student housing: a
+// community lists several. All fields optional except a name so it stays light.
 export interface FloorPlan {
   id: string;
   name: string;
   beds?: number | null;
   baths?: number | null;
   sqft?: number | null;
-  price?: number | null;
+  price?: number | null; // "from" price (lower bound when price_max set)
+  price_max?: number | null; // optional upper bound for a range
+  price_unit?: "unit" | "bed"; // "bed" = student lease-by-the-bed (default "unit")
+  availability?: PlanAvailability;
+  available_text?: string; // e.g. "Available Aug 2026"
   photo_url?: string;
   description?: string;
   tags?: string[];
-  cta?: CtaConfig;
+  cta?: CtaConfig; // per-plan apply / waitlist / tour button
 }
 
 // The "find your floor plan" questionnaire. Stored inside page_config (jsonb),
@@ -107,12 +113,29 @@ export interface QuizConfig {
   plans?: FloorPlan[];
 }
 
+export type PropertyType =
+  | "multifamily"
+  | "student"
+  | "single_family"
+  | "other";
+
+export const PROPERTY_TYPES: { value: PropertyType; label: string }[] = [
+  { value: "multifamily", label: "Multifamily" },
+  { value: "student", label: "Student housing" },
+  { value: "single_family", label: "Single-family" },
+  { value: "other", label: "Other" },
+];
+
 export interface PageConfig {
   photos?: string[];
   agent?: { name?: string; phone?: string; email?: string; photo_url?: string };
   // tour = show the lead form; text = sms link; link = external URL
   cta?: CtaConfig;
   theme?: { color?: string };
+  // First-class floor plans (units). Quiz references these; older configs may
+  // still have plans under quiz.plans — read via getPlans() in lib/listing.ts.
+  plans?: FloorPlan[];
+  property_type?: PropertyType;
   quiz?: QuizConfig;
 }
 

@@ -3,7 +3,16 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { siteUrl } from "@/lib/api";
-import type { Listing, PageConfig, QuizConfig } from "@/lib/types";
+import type {
+  FloorPlan,
+  Listing,
+  PageConfig,
+  PropertyType,
+  QuizConfig,
+} from "@/lib/types";
+import { PROPERTY_TYPES } from "@/lib/types";
+import { getPlans } from "@/lib/listing";
+import PlansEditor from "./PlansEditor";
 import QuizEditor from "./QuizEditor";
 
 function slugify(s: string): string {
@@ -37,6 +46,10 @@ export default function PageTab({
   );
   const [color, setColor] = useState(cfg0.theme?.color ?? "#1a73e8");
   const [quiz, setQuiz] = useState<QuizConfig>(cfg0.quiz ?? {});
+  const [plans, setPlans] = useState<FloorPlan[]>(getPlans(cfg0));
+  const [propertyType, setPropertyType] = useState<PropertyType>(
+    cfg0.property_type ?? "multifamily",
+  );
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -80,7 +93,16 @@ export default function PageTab({
   async function save() {
     setBusy(true);
     setMsg(null);
-    const page_config: PageConfig = { photos, agent, cta, theme: { color }, quiz };
+    const page_config: PageConfig = {
+      photos,
+      agent,
+      cta,
+      theme: { color },
+      plans,
+      property_type: propertyType,
+      // Plans live top-level now; strip any legacy quiz.plans.
+      quiz: { ...quiz, plans: undefined },
+    };
     const patch = {
       page_enabled: enabled,
       slug: enabled ? slug : listing.slug,
@@ -111,6 +133,21 @@ export default function PageTab({
           className="accent-violet-600 w-4 h-4"
         />
         Publish public property page
+      </label>
+
+      <label className="block">
+        <span className="text-xs text-[var(--muted)]">Property type</span>
+        <select
+          value={propertyType}
+          onChange={(e) => setPropertyType(e.target.value as PropertyType)}
+          className="input w-full mt-1"
+        >
+          {PROPERTY_TYPES.map((t) => (
+            <option key={t.value} value={t.value}>
+              {t.label}
+            </option>
+          ))}
+        </select>
       </label>
 
       <label className="block">
@@ -211,11 +248,13 @@ export default function PageTab({
         <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="h-9 w-12 border border-[var(--border)] rounded-lg cursor-pointer" />
       </label>
 
-      <QuizEditor
-        initialQuiz={cfg0.quiz ?? {}}
-        onChange={setQuiz}
+      <PlansEditor
+        initialPlans={getPlans(cfg0)}
+        onChange={setPlans}
         upload={(f) => upload(f)}
       />
+
+      <QuizEditor initialQuiz={cfg0.quiz ?? {}} plans={plans} onChange={setQuiz} />
 
       <div className="flex items-center gap-3">
         <button onClick={save} disabled={busy} className="btn btn-primary">

@@ -4,10 +4,86 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { Listing, PageConfig } from "@/lib/types";
+import type { FloorPlan, Listing, PageConfig } from "@/lib/types";
 import { quizIsLive } from "@/lib/quiz";
+import {
+  getPlans,
+  planPriceLabel,
+  summaryRange,
+  AVAILABILITY_BADGE,
+} from "@/lib/listing";
 import LeadForm from "./LeadForm";
 import PropertyQuiz from "./PropertyQuiz";
+
+function PlanCard({ plan, accent }: { plan: FloorPlan; accent: string }) {
+  const price = planPriceLabel(plan);
+  const specs = [
+    plan.beds != null ? `${plan.beds <= 0 ? "Studio" : `${plan.beds} bd`}` : null,
+    plan.baths != null ? `${plan.baths} ba` : null,
+    plan.sqft != null ? `${Number(plan.sqft).toLocaleString()} sqft` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const badge = AVAILABILITY_BADGE[plan.availability ?? "available"];
+  const cta = plan.cta;
+  return (
+    <div className="border border-[var(--border)] rounded-2xl overflow-hidden shadow-sm">
+      {plan.photo_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={plan.photo_url} alt={plan.name} className="w-full aspect-[4/3] object-cover" />
+      ) : null}
+      <div className="p-3 space-y-1.5">
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-semibold">{plan.name}</span>
+          <span className={`text-[11px] px-1.5 py-0.5 rounded-full shrink-0 ${badge.cls}`}>
+            {badge.text}
+          </span>
+        </div>
+        {specs && <div className="text-sm text-[var(--muted)]">{specs}</div>}
+        {price && (
+          <div className="text-sm font-semibold" style={{ color: accent }}>
+            {price}
+          </div>
+        )}
+        {plan.available_text && (
+          <div className="text-xs text-[var(--muted)]">{plan.available_text}</div>
+        )}
+        {plan.description && (
+          <p className="text-sm text-[var(--ink)]/80 whitespace-pre-wrap">
+            {plan.description}
+          </p>
+        )}
+        {cta?.value && cta.type === "link" ? (
+          <a
+            href={cta.value}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block text-center text-white rounded-xl py-2 text-sm font-semibold shadow-sm mt-1"
+            style={{ background: accent }}
+          >
+            {cta.label || "Apply"}
+          </a>
+        ) : cta?.value && cta.type === "text" ? (
+          <a
+            href={`sms:${cta.value}`}
+            className="block text-center text-white rounded-xl py-2 text-sm font-semibold shadow-sm mt-1"
+            style={{ background: accent }}
+          >
+            {cta.label || "Text me"}
+          </a>
+        ) : (
+          <a
+            href="#lead"
+            className="block text-center rounded-xl py-2 text-sm font-semibold mt-1 border"
+            style={{ borderColor: accent, color: accent }}
+          >
+            Request info
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export const dynamic = "force-dynamic";
 
@@ -60,7 +136,8 @@ export default async function PropertyPage({
   const photos = cfg.photos ?? [];
   const agent = cfg.agent ?? {};
   const cta = cfg.cta;
-  const showQuiz = quizIsLive(cfg.quiz);
+  const plans = getPlans(cfg);
+  const showQuiz = quizIsLive(cfg.quiz, plans.length);
   const mapHref = l.address
     ? `https://maps.google.com/?q=${encodeURIComponent(l.address)}`
     : null;
@@ -93,7 +170,9 @@ export default async function PropertyPage({
               </span>
             )}
             <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-            <p className="text-[var(--muted)] mt-0.5">{facts(l)}</p>
+            <p className="text-[var(--muted)] mt-0.5">
+              {plans.length ? summaryRange(plans) : facts(l)}
+            </p>
           </div>
 
           {photos.length > 1 && (
@@ -115,6 +194,19 @@ export default async function PropertyPage({
             <a href={mapHref} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium" style={{ color: accent }}>
               📍 View on map
             </a>
+          )}
+
+          {plans.length > 0 && (
+            <div className="border-t border-[var(--border)] pt-4 space-y-3">
+              <h2 className="text-sm font-semibold">
+                Floor plans ({plans.length})
+              </h2>
+              <div className="grid grid-cols-1 gap-3">
+                {plans.map((p) => (
+                  <PlanCard key={p.id} plan={p} accent={accent} />
+                ))}
+              </div>
+            </div>
           )}
 
           {(agent.name || agent.phone || agent.email) && (
@@ -150,9 +242,14 @@ export default async function PropertyPage({
             </a>
           )}
 
-          <div className="border-t border-[var(--border)] pt-4">
+          <div id="lead" className="border-t border-[var(--border)] pt-4 scroll-mt-4">
             {showQuiz ? (
-              <PropertyQuiz listingId={l.id} quiz={cfg.quiz!} accent={accent} />
+              <PropertyQuiz
+                listingId={l.id}
+                quiz={cfg.quiz!}
+                plans={plans}
+                accent={accent}
+              />
             ) : (
               <>
                 <h2 className="text-sm font-semibold mb-2">Request a tour</h2>

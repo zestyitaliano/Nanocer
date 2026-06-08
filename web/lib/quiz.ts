@@ -70,11 +70,13 @@ export function summarizeAnswers(
     .join("\n");
 }
 
-// True when a quiz is configured well enough to show on the public page.
-export function quizIsLive(quiz: QuizConfig | undefined): quiz is QuizConfig {
+// True when a quiz is configured well enough to show on the public page. Plans
+// now live at page_config.plans, so the count is passed in (see getPlans()).
+export function quizIsLive(
+  quiz: QuizConfig | undefined,
+  planCount: number,
+): quiz is QuizConfig {
   return Boolean(
-    quiz?.enabled &&
-      (quiz.plans?.length ?? 0) >= 1 &&
-      (quiz.questions?.length ?? 0) >= 1,
+    quiz?.enabled && planCount >= 1 && (quiz.questions?.length ?? 0) >= 1,
   );
 }

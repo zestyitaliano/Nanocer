@@ -81,14 +81,15 @@ function PlanCard({ plan, accent }: { plan: FloorPlan; accent: string }) {
 export default function PropertyQuiz({
   listingId,
   quiz,
+  plans,
   accent = "#1a73e8",
 }: {
   listingId: string;
   quiz: QuizConfig;
+  plans: FloorPlan[];
   accent?: string;
 }) {
   const questions = quiz.questions ?? [];
-  const plans = quiz.plans ?? [];
 
   // "intro" -> step through questions -> "result"
   const [stage, setStage] = useState<"intro" | "quiz" | "result">("intro");
