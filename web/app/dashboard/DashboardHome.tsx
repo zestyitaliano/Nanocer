@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
   LISTING_STATUSES,
+  PROPERTY_TYPES,
   type Listing,
   type ListingStatus,
+  type PropertyType,
   type QrCode,
 } from "@/lib/types";
 import ListingCard from "@/components/ListingCard";
@@ -269,9 +271,16 @@ export default function DashboardHome({
           onClose={() => setModal(false)}
           onCreate={async (fields) => {
             setBusy(true);
+            const { property_type, ...cols } = fields;
             const { data, error } = await supabase
               .from("listings")
-              .insert({ user_id: userId, name: "", ...fields })
+              .insert({
+                user_id: userId,
+                name: "",
+                ...cols,
+                // property_type lives in page_config (no column).
+                page_config: { property_type },
+              })
               .select()
               .single();
             setBusy(false);
@@ -374,6 +383,7 @@ function NewListingModal({
   onCreate: (fields: {
     address: string;
     status: ListingStatus;
+    property_type: PropertyType;
     price: number | null;
     beds: number | null;
     baths: number | null;
@@ -381,10 +391,13 @@ function NewListingModal({
 }) {
   const [address, setAddress] = useState("");
   const [status, setStatus] = useState<ListingStatus>("coming_soon");
+  const [propertyType, setPropertyType] = useState<PropertyType>("multifamily");
   const [price, setPrice] = useState("");
   const [beds, setBeds] = useState("");
   const [baths, setBaths] = useState("");
   const num = (s: string) => (s.trim() === "" ? null : Number(s));
+  // Communities carry their numbers on each floor plan, not the listing.
+  const isSingleHome = propertyType === "single_family";
 
   return (
     <div
@@ -407,6 +420,20 @@ function NewListingModal({
           />
         </label>
         <label className="block">
+          <span className="text-xs text-[var(--muted)]">Property type</span>
+          <select
+            value={propertyType}
+            onChange={(e) => setPropertyType(e.target.value as PropertyType)}
+            className="input w-full mt-1"
+          >
+            {PROPERTY_TYPES.map((t) => (
+              <option key={t.value} value={t.value}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block">
           <span className="text-xs text-[var(--muted)]">Status</span>
           <select
             value={status}
@@ -420,27 +447,43 @@ function NewListingModal({
             ))}
           </select>
         </label>
-        <div className="grid grid-cols-3 gap-2">
-          <label className="block">
-            <span className="text-xs text-[var(--muted)]">Price</span>
-            <input value={price} onChange={(e) => setPrice(e.target.value)} inputMode="numeric" className="input w-full mt-1" />
-          </label>
-          <label className="block">
-            <span className="text-xs text-[var(--muted)]">Beds</span>
-            <input value={beds} onChange={(e) => setBeds(e.target.value)} inputMode="numeric" className="input w-full mt-1" />
-          </label>
-          <label className="block">
-            <span className="text-xs text-[var(--muted)]">Baths</span>
-            <input value={baths} onChange={(e) => setBaths(e.target.value)} inputMode="numeric" className="input w-full mt-1" />
-          </label>
-        </div>
+
+        {isSingleHome ? (
+          <div className="grid grid-cols-3 gap-2">
+            <label className="block">
+              <span className="text-xs text-[var(--muted)]">Price</span>
+              <input value={price} onChange={(e) => setPrice(e.target.value)} inputMode="numeric" className="input w-full mt-1" />
+            </label>
+            <label className="block">
+              <span className="text-xs text-[var(--muted)]">Beds</span>
+              <input value={beds} onChange={(e) => setBeds(e.target.value)} inputMode="numeric" className="input w-full mt-1" />
+            </label>
+            <label className="block">
+              <span className="text-xs text-[var(--muted)]">Baths</span>
+              <input value={baths} onChange={(e) => setBaths(e.target.value)} inputMode="numeric" className="input w-full mt-1" />
+            </label>
+          </div>
+        ) : (
+          <p className="text-xs text-[var(--muted)] bg-violet-50 rounded-lg px-3 py-2">
+            Add floor plans (units) with their own beds/baths/pricing after
+            creating — in the listing&apos;s <span className="font-medium">Page</span> tab.
+          </p>
+        )}
+
         <div className="flex justify-end gap-2 pt-1">
           <button onClick={onClose} className="btn btn-secondary">
             Cancel
           </button>
           <button
             onClick={() =>
-              onCreate({ address: address.trim(), status, price: num(price), beds: num(beds), baths: num(baths) })
+              onCreate({
+                address: address.trim(),
+                status,
+                property_type: propertyType,
+                price: isSingleHome ? num(price) : null,
+                beds: isSingleHome ? num(beds) : null,
+                baths: isSingleHome ? num(baths) : null,
+              })
             }
             disabled={busy || !address.trim()}
             className="btn btn-primary"
