@@ -162,11 +162,20 @@ export interface Lead {
   created_at: string;
 }
 
+export interface Portfolio {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Listing {
   id: string;
   user_id: string;
   name: string;
   status: ListingStatus;
+  portfolio_id: string | null;
   address: string | null;
   price: number | null;
   beds: number | null;

@@ -11,6 +11,7 @@ import {
   type FloorPlan,
   type Listing,
   type ListingStatus,
+  type Portfolio,
   type QrCode,
 } from "@/lib/types";
 import { siteUrl } from "@/lib/api";
@@ -26,11 +27,13 @@ export default function ListingHub({
   listing: initial,
   initialCodes,
   initialFloorPlans,
+  portfolios,
   userId,
 }: {
   listing: Listing;
   initialCodes: QrCode[];
   initialFloorPlans: FloorPlan[];
+  portfolios: Portfolio[];
   userId: string;
 }) {
   const supabase = createClient();
@@ -39,6 +42,16 @@ export default function ListingHub({
   const [listing, setListing] = useState<Listing>(initial);
   const [codes, setCodes] = useState<QrCode[]>(initialCodes);
   const [busy, setBusy] = useState(false);
+
+  async function changePortfolio(v: string) {
+    const pid = v === "" ? null : v;
+    setListing((l) => ({ ...l, portfolio_id: pid }));
+    const { error } = await supabase
+      .from("listings")
+      .update({ portfolio_id: pid })
+      .eq("id", listing.id);
+    if (error) alert(error.message);
+  }
 
   // editable overview fields
   const [form, setForm] = useState({
@@ -183,6 +196,21 @@ export default function ListingHub({
       <div className="max-w-4xl mx-auto p-4 sm:p-6">
         {tab === "overview" && (
           <div className="card p-6 space-y-4 max-w-xl">
+            <label className="block">
+              <span className="text-xs text-[var(--muted)]">Portfolio</span>
+              <select
+                value={listing.portfolio_id ?? ""}
+                onChange={(e) => changePortfolio(e.target.value)}
+                className="input w-full mt-1"
+              >
+                <option value="">Unassigned</option>
+                {portfolios.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name || "(untitled)"}
+                  </option>
+                ))}
+              </select>
+            </label>
             <label className="block">
               <span className="text-xs text-[var(--muted)]">Address / name</span>
               <input
