@@ -27,3 +27,7 @@ yarn-error.log*
 # --- OS / editor ---
 .DS_Store
 Thumbs.db
+
+# --- Source font library (full trial set lives at repo root; the app ships
+# only the subset copied into web/app/fonts/) ---
+/fonts/

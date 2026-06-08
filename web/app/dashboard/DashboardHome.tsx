@@ -99,7 +99,7 @@ export default function DashboardHome({
           <div className="brand-gradient w-9 h-9 rounded-2xl grid place-items-center text-white font-bold shadow-sm">
             N
           </div>
-          <span className="font-semibold text-lg tracking-tight">Nanocer</span>
+          <span className="font-display font-semibold text-lg tracking-tight">Nanocer</span>
         </div>
 
         <nav className="space-y-1">
@@ -299,7 +299,7 @@ function StatCard({
         {icon}
       </div>
       <div className="min-w-0">
-        <div className="text-xl sm:text-2xl font-bold tracking-tight leading-none">
+        <div className="font-display text-xl sm:text-2xl font-bold tracking-tight leading-none">
           {value.toLocaleString()}
         </div>
         <div className="text-xs text-[var(--muted)] mt-1 truncate">{label}</div>

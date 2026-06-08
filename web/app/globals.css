@@ -26,16 +26,26 @@
   --color-background: var(--canvas);
   --color-foreground: var(--ink);
   --color-brand: var(--brand);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* GT Pressura drives body + UI; PP Frama is the display/headline face. */
+  --font-sans: var(--font-pressura);
+  --font-display: var(--font-frama);
 }
 
 body {
   background: var(--canvas);
   color: var(--ink);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+  font-family: var(--font-pressura), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Headlines use PP Frama. */
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-frama), Georgia, "Times New Roman", serif;
+  }
 }
 
 @layer components {
@@ -50,6 +60,9 @@ body {
   }
   .brand-text {
     color: var(--brand-strong);
+  }
+  .font-display {
+    font-family: var(--font-frama), Georgia, "Times New Roman", serif;
   }
 
   /* Cards ---------------------------------------------------------- */
@@ -74,6 +87,7 @@ body {
     border-radius: 0.75rem;
     padding: 0.55rem 0.8rem;
     font-size: 0.875rem;
+    font-family: inherit;
     color: var(--ink);
     transition: border-color 0.15s, box-shadow 0.15s;
   }
@@ -93,6 +107,7 @@ body {
     justify-content: center;
     gap: 0.4rem;
     border-radius: 9999px;
+    font-family: inherit;
     font-size: 0.875rem;
     font-weight: 600;
     line-height: 1;
