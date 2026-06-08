@@ -189,10 +189,8 @@ export default async function PropertyPage({
     : null;
   const statusBanner: { text: string; cls: string } | null =
     l.status === "leased_up"
-      ? { text: "Leased up", cls: "bg-neutral-200 text-neutral-700" }
-      : l.status === "coming_soon"
-        ? { text: "Pre-leasing", cls: "bg-amber-100 text-amber-800" }
-        : null;
+      ? { text: "Sold Out", cls: "bg-rose-100 text-rose-800" }
+      : null;
 
   return (
     <main className="min-h-screen sm:py-6">

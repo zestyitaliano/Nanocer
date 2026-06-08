@@ -40,23 +40,20 @@ export interface QrCode {
   updated_at: string;
 }
 
-// Leasing-oriented statuses (multifamily/student ILS). Keys reuse the original
-// coming_soon/active/other so no data migration is needed; leased_up replaces the
-// old for-sale under_contract/sold.
-export type ListingStatus = "coming_soon" | "active" | "leased_up" | "other";
+// Leasing statuses (multifamily/student ILS). Keys reuse the original
+// other/active/leased_up so no data migration is needed.
+export type ListingStatus = "other" | "active" | "leased_up";
 
 export const LISTING_STATUSES: { value: ListingStatus; label: string }[] = [
-  { value: "coming_soon", label: "Pre-leasing" },
-  { value: "active", label: "Now leasing" },
-  { value: "leased_up", label: "Leased up" },
-  { value: "other", label: "Other" },
+  { value: "other", label: "No Status" },
+  { value: "active", label: "Leasing" },
+  { value: "leased_up", label: "Sold Out" },
 ];
 
 export const STATUS_LABEL: Record<ListingStatus, string> = {
-  coming_soon: "Pre-leasing",
-  active: "Now leasing",
-  leased_up: "Leased up",
-  other: "Other",
+  other: "No Status",
+  active: "Leasing",
+  leased_up: "Sold Out",
 };
 
 // A call-to-action button. Shared by the page CTA, plan cards, and the quiz.

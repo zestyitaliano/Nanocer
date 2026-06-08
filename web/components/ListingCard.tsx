@@ -3,17 +3,16 @@
 import { STATUS_LABEL, type Listing, type ListingStatus } from "@/lib/types";
 
 export const STATUS_COLOR: Record<ListingStatus, string> = {
-  coming_soon: "bg-amber-100 text-amber-700",
-  active: "bg-emerald-100 text-emerald-700",
-  leased_up: "bg-neutral-200 text-neutral-600",
   other: "bg-neutral-100 text-neutral-500",
+  active: "bg-emerald-100 text-emerald-700",
+  leased_up: "bg-rose-100 text-rose-700",
 };
 
-// Tolerate any legacy status value (e.g. an old under_contract/sold row).
+// Tolerate any legacy status value (e.g. an old coming_soon/under_contract row).
 export const statusColor = (s: string) =>
   (STATUS_COLOR as Record<string, string>)[s] ?? STATUS_COLOR.other;
 export const statusLabelOf = (s: string) =>
-  (STATUS_LABEL as Record<string, string>)[s] ?? "Other";
+  (STATUS_LABEL as Record<string, string>)[s] ?? "No Status";
 
 export default function ListingCard({
   listing,

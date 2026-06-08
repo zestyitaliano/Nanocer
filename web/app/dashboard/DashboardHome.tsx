@@ -19,10 +19,9 @@ type StatusFilter = "all" | ListingStatus;
 // the reference's icon list, but stays meaningful to the data.
 const STATUS_DOT: Record<StatusFilter, string> = {
   all: "bg-violet-500",
-  coming_soon: "bg-amber-400",
-  active: "bg-emerald-500",
-  leased_up: "bg-neutral-400",
   other: "bg-neutral-300",
+  active: "bg-emerald-500",
+  leased_up: "bg-rose-400",
 };
 
 export default function DashboardHome({
@@ -389,7 +388,7 @@ function NewListingModal({
   }) => void;
 }) {
   const [address, setAddress] = useState("");
-  const [status, setStatus] = useState<ListingStatus>("coming_soon");
+  const [status, setStatus] = useState<ListingStatus>("other");
   const [propertyType, setPropertyType] = useState<PropertyType>("multifamily");
   const [price, setPrice] = useState("");
   const [beds, setBeds] = useState("");
