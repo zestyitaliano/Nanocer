@@ -11,6 +11,6 @@ export const config = {
   // Skip static assets and the public redirect route (/r/...) — redirects must
   // stay fast and never run auth/session logic.
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|r/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|r/|p/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

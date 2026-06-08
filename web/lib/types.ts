@@ -59,6 +59,25 @@ export const STATUS_LABEL: Record<ListingStatus, string> = {
   other: "Other",
 };
 
+export interface PageConfig {
+  photos?: string[];
+  agent?: { name?: string; phone?: string; email?: string; photo_url?: string };
+  // tour = show the lead form; text = sms link; link = external URL
+  cta?: { type: "tour" | "text" | "link"; label?: string; value?: string };
+  theme?: { color?: string };
+}
+
+export interface Lead {
+  id: number;
+  listing_id: string;
+  name: string | null;
+  phone: string | null;
+  email: string | null;
+  message: string | null;
+  source: string | null;
+  created_at: string;
+}
+
 export interface Listing {
   id: string;
   user_id: string;

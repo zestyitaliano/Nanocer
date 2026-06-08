@@ -15,6 +15,8 @@ import {
 import { siteUrl } from "@/lib/api";
 import { STATUS_COLOR } from "@/components/ListingCard";
 import QrThumb from "@/components/QrThumb";
+import PageTab from "./PageTab";
+import LeadsTab from "./LeadsTab";
 
 type Tab = "overview" | "codes" | "page" | "leads" | "analytics";
 
@@ -273,11 +275,19 @@ export default function ListingHub({
           </div>
         )}
 
-        {(tab === "page" || tab === "leads" || tab === "analytics") && (
+        {tab === "page" && (
+          <PageTab
+            listing={listing}
+            userId={userId}
+            onSaved={(patch) => setListing((l) => ({ ...l, ...patch }))}
+          />
+        )}
+
+        {tab === "leads" && <LeadsTab listingId={listing.id} />}
+
+        {tab === "analytics" && (
           <div className="text-center text-neutral-400 text-sm py-16 border rounded-xl bg-white">
-            {tab === "page" && "Hosted property page — coming next."}
-            {tab === "leads" && "Lead capture — coming with the property page."}
-            {tab === "analytics" && "Per-listing analytics — coming soon."}
+            Per-listing analytics — coming soon.
           </div>
         )}
       </div>
