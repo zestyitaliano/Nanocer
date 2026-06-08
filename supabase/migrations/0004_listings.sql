@@ -48,9 +48,10 @@ begin
     end if;
 end $$;
 
--- Drop the old linkage now that data is migrated.
-alter table public.codes drop column if exists folder_id;
-drop table if exists public.folders cascade;
+-- NOTE: we intentionally do NOT drop the old `folders` table or
+-- `codes.folder_id` here. Leaving them keeps the previously-deployed dashboard
+-- working during the deploy window (zero-downtime). The new app ignores them.
+-- A later optional migration (0005) can drop them once the new app is live.
 
 -- updated_at trigger (reuse set_updated_at from 0001_init.sql)
 drop trigger if exists trg_listings_updated_at on public.listings;
