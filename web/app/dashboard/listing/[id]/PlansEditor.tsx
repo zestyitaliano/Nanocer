@@ -27,7 +27,7 @@ interface DraftPlan {
   price_unit: "unit" | "bed";
   availability: PlanAvailability;
   available_text: string;
-  photo_url?: string;
+  photos: string[];
   description: string;
   tags: string;
   ctaType: CtaType;
@@ -51,7 +51,7 @@ function toDraft(p: FloorPlan): DraftPlan {
     price_unit: p.price_unit ?? "unit",
     availability: p.availability ?? "available",
     available_text: p.available_text ?? "",
-    photo_url: p.photo_url,
+    photos: p.photos && p.photos.length ? p.photos : p.photo_url ? [p.photo_url] : [],
     description: p.description ?? "",
     tags: (p.tags ?? []).join(", "),
     ctaType: (p.cta?.type as CtaType) ?? "none",
@@ -71,7 +71,8 @@ function toRow(d: DraftPlan) {
     price_unit: d.price_unit,
     availability: d.availability,
     available_text: d.available_text.trim() || null,
-    photo_url: d.photo_url || null,
+    photos: d.photos,
+    photo_url: d.photos[0] ?? null,
     description: d.description.trim() || null,
     tags: splitTags(d.tags),
     cta:
@@ -161,21 +162,34 @@ export default function PlansEditor({
     sync(plans);
   }
 
-  async function uploadPhoto(id: string, e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
-    if (!f) return;
+  async function savePhotos(id: string, photos: string[]) {
+    const next = plans.map((x) => (x.id === id ? { ...x, photos } : x));
+    setPlans(next);
+    await supabase
+      .from("floor_plans")
+      .update({ photos, photo_url: photos[0] ?? null })
+      .eq("id", id);
+    onChange(next.map((d, i) => toPlan(d, listingId, i)));
+  }
+
+  async function addPhotos(id: string, e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
     setBusy(true);
-    const u = await upload(f);
-    setBusy(false);
-    if (u) {
-      patch(id, { photo_url: u });
-      await supabase.from("floor_plans").update({ photo_url: u }).eq("id", id);
-      setPlans((prev) => {
-        sync(prev);
-        return prev;
-      });
+    const current = plans.find((x) => x.id === id)?.photos ?? [];
+    const uploaded: string[] = [];
+    for (const f of files) {
+      const u = await upload(f);
+      if (u) uploaded.push(u);
     }
+    setBusy(false);
+    if (uploaded.length) await savePhotos(id, [...current, ...uploaded]);
     e.target.value = "";
+  }
+
+  async function removePhoto(id: string, i: number) {
+    const current = plans.find((x) => x.id === id)?.photos ?? [];
+    await savePhotos(id, current.filter((_, j) => j !== i));
   }
 
   async function addCodeForPlan(id: string, name: string) {
@@ -277,15 +291,26 @@ export default function PlansEditor({
           <textarea className="input w-full" rows={2} placeholder="Description (optional)" value={p.description} onChange={(e) => patch(p.id, { description: e.target.value })} onBlur={() => persist(p.id)} />
           <input className="input w-full" placeholder="Match tags, comma-separated (e.g. 2bed, budget, furnished)" value={p.tags} onChange={(e) => patch(p.id, { tags: e.target.value })} onBlur={() => persist(p.id)} />
 
-          <div className="flex items-center gap-2">
-            <label className="text-xs text-[var(--muted)] flex items-center gap-2">
-              Photo:
-              <input type="file" accept="image/*" className="text-xs" onChange={(e) => uploadPhoto(p.id, e)} />
-            </label>
-            {p.photo_url && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={p.photo_url} alt="" className="w-10 h-10 object-cover rounded border" />
-            )}
+          <div>
+            <span className="text-xs text-[var(--muted)]">Photos</span>
+            <div className="flex flex-wrap gap-2 mt-1">
+              {p.photos.map((src, j) => (
+                <div key={j} className="relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={src} alt="" className="w-14 h-14 object-cover rounded border border-[var(--border)]" />
+                  <button
+                    onClick={() => removePhoto(p.id, j)}
+                    className="absolute -top-1.5 -right-1.5 bg-white border border-[var(--border)] shadow-sm rounded-full w-5 h-5 text-xs text-red-500 grid place-items-center"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              <label className="w-14 h-14 border border-dashed border-violet-300 bg-violet-50/50 rounded-lg flex items-center justify-center text-violet-400 text-xl cursor-pointer hover:bg-violet-50 transition">
+                +
+                <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => addPhotos(p.id, e)} />
+              </label>
+            </div>
           </div>
 
           <div className="flex gap-2 items-center">

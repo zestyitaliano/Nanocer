@@ -14,6 +14,7 @@ import {
 } from "@/lib/listing";
 import LeadForm from "./LeadForm";
 import PropertyQuiz from "./PropertyQuiz";
+import Gallery from "@/components/Gallery";
 
 async function getFloorPlans(listingId: string): Promise<FloorPlan[]> {
   const admin = createAdminClient();
@@ -41,10 +42,10 @@ function PlanCard({ plan, accent }: { plan: FloorPlan; accent: string }) {
       id={`fp-${plan.id}`}
       className="border border-[var(--border)] rounded-2xl overflow-hidden shadow-sm scroll-mt-4 target:ring-2 target:ring-violet-400"
     >
-      {plan.photo_url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={plan.photo_url} alt={plan.name} className="w-full aspect-[4/3] object-cover" />
-      ) : null}
+      <Gallery
+        images={plan.photos?.length ? plan.photos : plan.photo_url ? [plan.photo_url] : []}
+        alt={plan.name}
+      />
       <div className="p-3 space-y-1.5">
         <div className="flex items-center justify-between gap-2">
           <span className="font-semibold">{plan.name}</span>
@@ -198,9 +199,8 @@ export default async function PropertyPage({
   return (
     <main className="min-h-screen sm:py-6">
       <div className="max-w-md mx-auto bg-white min-h-screen sm:min-h-0 sm:rounded-3xl sm:shadow-[var(--shadow-md)] overflow-hidden">
-        {photos[0] ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={photos[0]} alt={title} className="w-full aspect-[4/3] object-cover" />
+        {photos.length ? (
+          <Gallery images={photos} alt={title} />
         ) : (
           <div className="w-full aspect-[4/3] bg-neutral-100" />
         )}
@@ -219,15 +219,6 @@ export default async function PropertyPage({
               {plans.length ? summaryRange(plans) : facts(l)}
             </p>
           </div>
-
-          {photos.length > 1 && (
-            <div className="grid grid-cols-3 gap-1.5">
-              {photos.slice(1, 7).map((src, i) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img key={i} src={src} alt="" className="w-full aspect-square object-cover rounded-xl" />
-              ))}
-            </div>
-          )}
 
           {l.description && (
             <p className="text-sm text-[var(--ink)]/80 whitespace-pre-wrap leading-relaxed">

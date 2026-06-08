@@ -103,7 +103,8 @@ export interface FloorPlan {
   price_unit?: "unit" | "bed"; // "bed" = student lease-by-the-bed (default "unit")
   availability?: PlanAvailability;
   available_text?: string; // e.g. "Available Aug 2026"
-  photo_url?: string;
+  photo_url?: string; // legacy primary; kept in sync with photos[0]
+  photos?: string[];
   description?: string;
   tags?: string[];
   cta?: CtaConfig; // per-plan apply / waitlist / tour button
