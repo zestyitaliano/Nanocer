@@ -55,7 +55,7 @@ export default function EditorView({
           {code.title || code.short_code}
         </span>
         <div className="ml-auto flex items-center gap-2">
-          <label className="text-xs text-[var(--muted)] hidden sm:inline">Listing</label>
+          <label className="text-xs text-[var(--muted)] hidden sm:inline">Property</label>
           <select
             value={listingId ?? ""}
             onChange={(e) => changeListing(e.target.value)}

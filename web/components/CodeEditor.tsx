@@ -221,13 +221,13 @@ export default function CodeEditor({
                   <p className="text-[11px] text-[var(--muted)] bg-violet-50 rounded-lg px-3 py-2">
                     Resolves to{" "}
                     <span className="font-medium">/p/{listing.slug}</span> —
-                    change the page in the listing&apos;s Page tab and every code
+                    change the page in the property&apos;s Page tab and every code
                     follows, no reprint.
                   </p>
                 ) : (
                   <>
                     <p className="text-[11px] text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
-                      This listing&apos;s page isn&apos;t published yet (Page tab).
+                      This property&apos;s page isn&apos;t published yet (Page tab).
                       Until then, scans fall back to the URL below.
                     </p>
                     <label className="block">
@@ -266,7 +266,7 @@ export default function CodeEditor({
                   </p>
                 ) : (
                   <p className="text-[11px] text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
-                    Publish this listing&apos;s page (Page tab) to activate.
+                    Publish this property&apos;s page (Page tab) to activate.
                   </p>
                 )}
               </div>

@@ -8,92 +8,72 @@ import {
   PROPERTY_TYPES,
   type Listing,
   type ListingStatus,
-  type Portfolio,
   type PropertyType,
   type QrCode,
 } from "@/lib/types";
 import ListingCard from "@/components/ListingCard";
 
 type StatusFilter = "all" | ListingStatus;
-type PortfolioFilter = "all" | "unassigned" | string;
+
+// Dot colour per status for the sidebar nav.
+const STATUS_DOT: Record<StatusFilter, string> = {
+  all: "bg-violet-500",
+  other: "bg-neutral-300",
+  active: "bg-emerald-500",
+  leased_up: "bg-rose-400",
+};
 
 export default function DashboardHome({
   initialListings,
   initialCodes,
   initialLeads,
-  initialPortfolios,
   userId,
   userEmail,
 }: {
   initialListings: Listing[];
   initialCodes: Pick<QrCode, "id" | "listing_id" | "scan_count">[];
   initialLeads: { listing_id: string }[];
-  initialPortfolios: Portfolio[];
   userId: string;
   userEmail: string;
 }) {
   const supabase = createClient();
   const router = useRouter();
-  const [listings, setListings] = useState<Listing[]>(initialListings);
-  const [portfolios, setPortfolios] = useState<Portfolio[]>(initialPortfolios);
-  const [portfolioFilter, setPortfolioFilter] = useState<PortfolioFilter>("all");
+  const [listings] = useState<Listing[]>(initialListings);
   const [status, setStatus] = useState<StatusFilter>("all");
   const [search, setSearch] = useState("");
   const [modal, setModal] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [menuFor, setMenuFor] = useState<string | null>(null);
 
-  // per-listing rollups
   const perListing = useMemo(() => {
     const codes: Record<string, number> = {};
     const scans: Record<string, number> = {};
-    const leads: Record<string, number> = {};
     for (const c of initialCodes) {
       if (!c.listing_id) continue;
       codes[c.listing_id] = (codes[c.listing_id] ?? 0) + 1;
       scans[c.listing_id] = (scans[c.listing_id] ?? 0) + (c.scan_count ?? 0);
     }
-    for (const l of initialLeads) {
-      if (l.listing_id) leads[l.listing_id] = (leads[l.listing_id] ?? 0) + 1;
-    }
-    return { codes, scans, leads };
-  }, [initialCodes, initialLeads]);
+    return { codes, scans };
+  }, [initialCodes]);
 
-  const portfolioCounts = useMemo(() => {
-    const m: Record<string, number> = { all: listings.length, unassigned: 0 };
-    for (const l of listings) {
-      if (l.portfolio_id) m[l.portfolio_id] = (m[l.portfolio_id] ?? 0) + 1;
-      else m.unassigned += 1;
+  const totals = useMemo(() => {
+    let codes = 0,
+      scans = 0;
+    for (const c of initialCodes) {
+      codes += 1;
+      scans += c.scan_count ?? 0;
     }
+    return { properties: listings.length, codes, scans, leads: initialLeads.length };
+  }, [initialCodes, initialLeads, listings.length]);
+
+  const statusCounts = useMemo(() => {
+    const m: Record<string, number> = { all: listings.length };
+    for (const l of listings) m[l.status] = (m[l.status] ?? 0) + 1;
     return m;
   }, [listings]);
-
-  const inPortfolio = (l: Listing) =>
-    portfolioFilter === "all"
-      ? true
-      : portfolioFilter === "unassigned"
-        ? !l.portfolio_id
-        : l.portfolio_id === portfolioFilter;
-
-  // Stat cards reflect the selected portfolio scope (ignoring status/search).
-  const scope = useMemo(() => {
-    const ls = listings.filter(inPortfolio);
-    let codes = 0,
-      scans = 0,
-      leads = 0;
-    for (const l of ls) {
-      codes += perListing.codes[l.id] ?? 0;
-      scans += perListing.scans[l.id] ?? 0;
-      leads += perListing.leads[l.id] ?? 0;
-    }
-    return { listings: ls.length, codes, scans, leads };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listings, perListing, portfolioFilter]);
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
     return listings.filter((l) => {
-      if (!inPortfolio(l)) return false;
       if (status !== "all" && l.status !== status) return false;
       if (!q) return true;
       return (
@@ -101,41 +81,7 @@ export default function DashboardHome({
         (l.address ?? "").toLowerCase().includes(q)
       );
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listings, portfolioFilter, status, search]);
-
-  // --- portfolio CRUD ------------------------------------------------------
-  async function createPortfolio() {
-    const name = window.prompt("New portfolio name:")?.trim();
-    if (!name) return;
-    const { data, error } = await supabase
-      .from("portfolios")
-      .insert({ user_id: userId, name })
-      .select()
-      .single();
-    if (error) return alert(error.message);
-    setPortfolios((p) => [...p, data as Portfolio].sort((a, b) => a.name.localeCompare(b.name)));
-  }
-  async function renamePortfolio(id: string, current: string) {
-    const name = window.prompt("Rename portfolio:", current)?.trim();
-    if (!name) return;
-    const { error } = await supabase.from("portfolios").update({ name }).eq("id", id);
-    if (error) return alert(error.message);
-    setPortfolios((p) =>
-      p.map((x) => (x.id === id ? { ...x, name } : x)).sort((a, b) => a.name.localeCompare(b.name)),
-    );
-  }
-  async function deletePortfolio(id: string) {
-    if (!window.confirm("Delete this portfolio? Its listings become Unassigned."))
-      return;
-    const { error } = await supabase.from("portfolios").delete().eq("id", id);
-    if (error) return alert(error.message);
-    setPortfolios((p) => p.filter((x) => x.id !== id));
-    setListings((ls) =>
-      ls.map((l) => (l.portfolio_id === id ? { ...l, portfolio_id: null } : l)),
-    );
-    if (portfolioFilter === id) setPortfolioFilter("all");
-  }
+  }, [listings, status, search]);
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -145,54 +91,31 @@ export default function DashboardHome({
 
   const initial = (userEmail?.[0] ?? "U").toUpperCase();
   const heading =
-    portfolioFilter === "all"
-      ? "All listings"
-      : portfolioFilter === "unassigned"
-        ? "Unassigned"
-        : portfolios.find((p) => p.id === portfolioFilter)?.name ?? "Portfolio";
+    status === "all"
+      ? "All properties"
+      : LISTING_STATUSES.find((s) => s.value === status)?.label;
 
   return (
     <div className="min-h-screen md:grid md:grid-cols-[248px_1fr]">
       {/* Sidebar ----------------------------------------------------- */}
       <aside className="hidden md:flex flex-col gap-6 p-5 border-r border-[var(--border)] bg-white/60 backdrop-blur">
         <div className="flex items-center gap-2.5 px-1">
-          <div className="brand-gradient w-9 h-9 rounded-2xl grid place-items-center text-white font-bold shadow-sm">
-            N
-          </div>
+          <div className="brand-gradient w-9 h-9 rounded-2xl grid place-items-center text-white font-bold shadow-sm">N</div>
           <span className="font-display font-semibold text-lg tracking-tight">Nanocer</span>
         </div>
 
         <nav className="space-y-1">
-          <div className="px-3 mb-1 flex items-center justify-between">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--muted)]">
-              Portfolios
-            </span>
-            <button onClick={createPortfolio} className="brand-text text-sm font-medium" aria-label="New portfolio">
-              +
-            </button>
-          </div>
-          <SidebarItem label="All listings" dot="bg-violet-500" count={portfolioCounts.all ?? 0} active={portfolioFilter === "all"} onClick={() => setPortfolioFilter("all")} />
-          <SidebarItem label="Unassigned" dot="bg-neutral-300" count={portfolioCounts.unassigned ?? 0} active={portfolioFilter === "unassigned"} onClick={() => setPortfolioFilter("unassigned")} />
-          {portfolios.map((p) => (
-            <div key={p.id} className="relative flex items-center">
-              <SidebarItem label={p.name || "(untitled)"} dot="bg-indigo-400" count={portfolioCounts[p.id] ?? 0} active={portfolioFilter === p.id} onClick={() => setPortfolioFilter(p.id)} />
-              <button onClick={() => setMenuFor(menuFor === p.id ? null : p.id)} className="absolute right-1 px-1 text-[var(--muted)] hover:text-[var(--ink)]" aria-label="portfolio actions">
-                ⋯
-              </button>
-              {menuFor === p.id && (
-                <div className="absolute right-0 top-9 z-10 w-32 card shadow-[var(--shadow-md)] text-sm py-1">
-                  <button onClick={() => { setMenuFor(null); renamePortfolio(p.id, p.name); }} className="block w-full text-left px-3 py-1.5 hover:bg-neutral-50">Rename</button>
-                  <button onClick={() => { setMenuFor(null); deletePortfolio(p.id); }} className="block w-full text-left px-3 py-1.5 hover:bg-red-50 text-red-600">Delete</button>
-                </div>
-              )}
-            </div>
+          <p className="px-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--muted)] mb-1">
+            Properties
+          </p>
+          <SidebarItem label="All properties" dot={STATUS_DOT.all} count={statusCounts.all ?? 0} active={status === "all"} onClick={() => setStatus("all")} />
+          {LISTING_STATUSES.map((s) => (
+            <SidebarItem key={s.value} label={s.label} dot={STATUS_DOT[s.value]} count={statusCounts[s.value] ?? 0} active={status === s.value} onClick={() => setStatus(s.value)} />
           ))}
         </nav>
 
         <div className="mt-auto card p-3 flex items-center gap-3">
-          <div className="brand-gradient w-9 h-9 rounded-full grid place-items-center text-white text-sm font-semibold shrink-0">
-            {initial}
-          </div>
+          <div className="brand-gradient w-9 h-9 rounded-full grid place-items-center text-white text-sm font-semibold shrink-0">{initial}</div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium truncate">{userEmail}</p>
             <button onClick={signOut} className="text-xs brand-text font-medium">Sign out</button>
@@ -209,10 +132,10 @@ export default function DashboardHome({
               <circle cx="9" cy="9" r="6" />
               <path d="m17 17-3.5-3.5" strokeLinecap="round" />
             </svg>
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search listings…" className="input w-full pl-9" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search properties…" className="input w-full pl-9" />
           </div>
           <button onClick={() => setModal(true)} className="btn btn-primary ml-auto">
-            <span className="text-base leading-none">+</span> New Listing
+            <span className="text-base leading-none">+</span> New Property
           </button>
           <button onClick={signOut} className="md:hidden btn btn-secondary btn-sm">Sign out</button>
         </div>
@@ -224,33 +147,15 @@ export default function DashboardHome({
             <p className="text-sm/relaxed text-white/80 font-medium">Your own owned ILS</p>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Turn every sign &amp; flyer into a tracked lead source.</h1>
             <p className="text-white/85 text-sm max-w-md">Restyle and re-point QR codes anytime, host property pages, and watch the scans roll in — no reprinting.</p>
-            <button onClick={() => setModal(true)} className="btn bg-[#1a1924] text-white hover:bg-black mt-1">+ New Listing</button>
+            <button onClick={() => setModal(true)} className="btn bg-[#1a1924] text-white hover:bg-black mt-1">+ New Property</button>
           </div>
         </section>
 
-        {/* stat cards (scoped to selected portfolio) */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <StatCard label="Listings" value={scope.listings} icon="🏠" />
-          <StatCard label="QR codes" value={scope.codes} icon="▣" />
-          <StatCard label="Total scans" value={scope.scans} icon="📈" />
-          <StatCard label="Leads" value={scope.leads} icon="✉️" />
-        </div>
-
-        {portfolioFilter !== "all" && portfolioFilter !== "unassigned" && (
-          <button
-            onClick={() => router.push(`/dashboard/portfolio/${portfolioFilter}`)}
-            className="brand-text text-sm font-medium"
-          >
-            View portfolio analytics →
-          </button>
-        )}
-
-        {/* status filter chips */}
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-          <FilterChip label="All" active={status === "all"} onClick={() => setStatus("all")} />
-          {LISTING_STATUSES.map((s) => (
-            <FilterChip key={s.value} label={s.label} active={status === s.value} onClick={() => setStatus(s.value)} />
-          ))}
+          <StatCard label="Properties" value={totals.properties} icon="🏠" />
+          <StatCard label="QR codes" value={totals.codes} icon="▣" />
+          <StatCard label="Total scans" value={totals.scans} icon="📈" />
+          <StatCard label="Leads" value={totals.leads} icon="✉️" />
         </div>
 
         <section>
@@ -260,8 +165,8 @@ export default function DashboardHome({
           </h2>
           {visible.length === 0 ? (
             <div className="card text-center text-[var(--muted)] text-sm py-20 px-4">
-              No listings here yet. Click{" "}
-              <span className="font-medium text-[var(--ink)]">+ New Listing</span> to add one.
+              No properties here yet. Click{" "}
+              <span className="font-medium text-[var(--ink)]">+ New Property</span> to add one.
             </div>
           ) : (
             <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(230px,1fr))]">
@@ -280,25 +185,15 @@ export default function DashboardHome({
       </main>
 
       {modal && (
-        <NewListingModal
+        <NewPropertyModal
           busy={busy}
           onClose={() => setModal(false)}
           onCreate={async (fields) => {
             setBusy(true);
             const { property_type, ...cols } = fields;
-            const portfolio_id =
-              portfolioFilter !== "all" && portfolioFilter !== "unassigned"
-                ? portfolioFilter
-                : null;
             const { data, error } = await supabase
               .from("listings")
-              .insert({
-                user_id: userId,
-                name: "",
-                ...cols,
-                portfolio_id,
-                page_config: { property_type },
-              })
+              .insert({ user_id: userId, name: "", ...cols, page_config: { property_type } })
               .select()
               .single();
             setBusy(false);
@@ -338,20 +233,7 @@ function SidebarItem({ label, dot, count, active, onClick }: { label: string; do
   );
 }
 
-function FilterChip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`chip border whitespace-nowrap ${
-        active ? "brand-gradient text-white border-transparent" : "bg-white text-[var(--muted)] border-[var(--border)]"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
-
-function NewListingModal({
+function NewPropertyModal({
   busy,
   onClose,
   onCreate,
@@ -379,7 +261,7 @@ function NewListingModal({
   return (
     <div className="fixed inset-0 bg-[#1a1924]/40 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={onClose}>
       <div className="card p-6 w-full max-w-md space-y-4 shadow-[var(--shadow-md)]" onClick={(e) => e.stopPropagation()}>
-        <h2 className="font-semibold text-lg tracking-tight">New Listing</h2>
+        <h2 className="font-semibold text-lg tracking-tight">New Property</h2>
         <label className="block">
           <span className="text-xs text-[var(--muted)]">Address / name</span>
           <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="123 Main St, Springfield" className="input w-full mt-1" autoFocus />
@@ -405,7 +287,7 @@ function NewListingModal({
           </div>
         ) : (
           <p className="text-xs text-[var(--muted)] bg-violet-50 rounded-lg px-3 py-2">
-            Add floor plans (units) with their own beds/baths/pricing after creating — in the listing&apos;s <span className="font-medium">Page</span> tab.
+            Add floor plans (units) with their own beds/baths/pricing after creating — in the property&apos;s <span className="font-medium">Page</span> tab.
           </p>
         )}
 
