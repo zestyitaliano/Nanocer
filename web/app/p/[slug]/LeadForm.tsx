@@ -23,6 +23,8 @@ export default function LeadForm({
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [hp, setHp] = useState(""); // honeypot — real users never fill this
+  const [renderedAt] = useState(() => Date.now()); // time-trap baseline
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -39,6 +41,8 @@ export default function LeadForm({
       message,
       recommendation,
       quizSummary,
+      hp,
+      t: renderedAt,
     });
     setBusy(false);
     if (res.ok) setDone(true);
@@ -55,6 +59,17 @@ export default function LeadForm({
 
   return (
     <form onSubmit={submit} className="space-y-2">
+      {/* honeypot: hidden from humans, bots tend to fill it */}
+      <input
+        type="text"
+        name="company"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        value={hp}
+        onChange={(e) => setHp(e.target.value)}
+        style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+      />
       <input
         required
         placeholder="Your name"

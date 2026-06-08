@@ -15,7 +15,15 @@ export async function submitLead(input: {
   // pre-segmented lead without needing a new column.
   recommendation?: string;
   quizSummary?: string;
+  // Anti-spam: hp = honeypot (must stay empty); t = form render time (ms).
+  hp?: string;
+  t?: number;
 }): Promise<{ ok: boolean; error?: string }> {
+  // Bots fill the hidden honeypot, or submit near-instantly. Pretend success so
+  // we don't reveal the trap, but drop the submission.
+  if (input.hp && input.hp.trim()) return { ok: true };
+  if (input.t && Date.now() - input.t < 2000) return { ok: true };
+
   if (!input.name?.trim() || !input.phone?.trim()) {
     return { ok: false, error: "Name and phone are required." };
   }
@@ -28,6 +36,20 @@ export async function submitLead(input: {
     .eq("page_enabled", true)
     .maybeSingle();
   if (!listing) return { ok: false, error: "This page is not available." };
+
+  // Light flood cap: no more than 8 leads per listing per 5 minutes.
+  const since = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+  const { count } = await admin
+    .from("leads")
+    .select("id", { count: "exact", head: true })
+    .eq("listing_id", input.listingId)
+    .gte("created_at", since);
+  if ((count ?? 0) >= 8) {
+    return {
+      ok: false,
+      error: "Too many submissions right now — please try again in a few minutes.",
+    };
+  }
 
   // Compose the stored message from any free-text message plus the quiz context.
   const parts = [

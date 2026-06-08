@@ -105,9 +105,31 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const l = await getListing(slug);
-  if (!l) return { title: "Not found" };
+  if (!l) return { title: "Not found", robots: { index: false } };
   const title = l.address || l.name || "Property";
-  return { title: `${title} · Nanocer` };
+  const cfg = (l.page_config ?? {}) as PageConfig;
+  const photos = cfg.photos ?? [];
+  const description =
+    (l.description ?? "").trim().slice(0, 160) ||
+    `View details, floor plans, and availability for ${title}.`;
+  const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://nanocer.com").replace(
+    /\/$/,
+    "",
+  );
+  const url = `${base}/p/${l.slug}`;
+  return {
+    title: `${title} · Nanocer`,
+    description,
+    alternates: { canonical: url },
+    robots: { index: true, follow: true },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "website",
+      images: photos[0] ? [{ url: photos[0] }] : undefined,
+    },
+  };
 }
 
 function facts(l: Listing): string {
