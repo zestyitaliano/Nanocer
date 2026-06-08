@@ -64,6 +64,14 @@ export default async function PropertyPage({
   const mapHref = l.address
     ? `https://maps.google.com/?q=${encodeURIComponent(l.address)}`
     : null;
+  const statusBanner: { text: string; cls: string } | null =
+    l.status === "under_contract"
+      ? { text: "Under contract", cls: "bg-amber-100 text-amber-800" }
+      : l.status === "sold"
+        ? { text: "No longer available", cls: "bg-neutral-200 text-neutral-700" }
+        : l.status === "coming_soon"
+          ? { text: "Coming soon", cls: "bg-blue-100 text-blue-800" }
+          : null;
 
   return (
     <main className="min-h-screen sm:py-6">
@@ -77,6 +85,13 @@ export default async function PropertyPage({
 
         <div className="p-5 space-y-4">
           <div>
+            {statusBanner && (
+              <span
+                className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-1.5 ${statusBanner.cls}`}
+              >
+                {statusBanner.text}
+              </span>
+            )}
             <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
             <p className="text-[var(--muted)] mt-0.5">{facts(l)}</p>
           </div>

@@ -98,6 +98,8 @@ export default function ListingHub({
             content: isDynamic ? "" : "https://example.com",
             style: DEFAULT_STYLE,
             listing_id: listing.id,
+            // Point at the property page by default once it's published.
+            target_mode: isDynamic && listing.page_enabled ? "listing_page" : "url",
           })
           .select()
           .single();

@@ -15,20 +15,25 @@ export async function GET(
   const { code } = await params;
   const admin = createAdminClient();
 
-  const { data: destination, error } = await admin.rpc("increment_scan", {
+  const { data: target, error } = await admin.rpc("increment_scan", {
     p_short_code: code,
     p_user_agent: request.headers.get("user-agent") ?? null,
     p_country: request.headers.get("x-vercel-ip-country") ?? null,
   });
 
-  if (error || !destination) {
+  if (error || !target) {
     return new NextResponse(notFoundHtml(code), {
       status: 404,
       headers: { "content-type": "text/html" },
     });
   }
 
-  return NextResponse.redirect(destination as string, 302);
+  // target is either an absolute URL ('url' mode) or a relative '/p/<slug>'
+  // ('listing_page' mode) — resolve relative paths against this request's origin
+  // so it works on the live domain and on preview deployments alike.
+  const t = target as string;
+  const url = t.startsWith("/") ? new URL(t, request.nextUrl.origin).toString() : t;
+  return NextResponse.redirect(url, 302);
 }
 
 function notFoundHtml(code: string): string {

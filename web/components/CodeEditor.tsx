@@ -14,14 +14,24 @@ import { siteUrl } from "@/lib/api";
 import QrPreview from "./QrPreview";
 import Analytics from "./Analytics";
 
+export type EditorListing = {
+  id: string;
+  name: string;
+  address: string | null;
+  slug: string | null;
+  page_enabled: boolean;
+};
+
 export default function CodeEditor({
   code,
   userId,
+  listing,
   onSaved,
   onDeleted,
 }: {
   code: QrCode;
   userId: string;
+  listing?: EditorListing | null;
   onSaved: (c: QrCode) => void;
   onDeleted: (id: string) => void;
 }) {
@@ -29,6 +39,9 @@ export default function CodeEditor({
   const [title, setTitle] = useState(code.title);
   const [isDynamic, setIsDynamic] = useState(code.is_dynamic);
   const [destination, setDestination] = useState(code.destination);
+  const [targetMode, setTargetMode] = useState<"url" | "listing_page">(
+    code.target_mode,
+  );
   const [content, setContent] = useState(code.content);
   const [style, setStyle] = useState<QrStyle>({ ...DEFAULT_STYLE, ...code.style });
   const [busy, setBusy] = useState<string | null>(null);
@@ -40,6 +53,7 @@ export default function CodeEditor({
     setTitle(code.title);
     setIsDynamic(code.is_dynamic);
     setDestination(code.destination);
+    setTargetMode(code.target_mode);
     setContent(code.content);
     setStyle({ ...DEFAULT_STYLE, ...code.style });
     setMsg(null);
@@ -58,7 +72,14 @@ export default function CodeEditor({
     setMsg(null);
     const { data, error } = await supabase
       .from("codes")
-      .update({ title, is_dynamic: isDynamic, destination, content, style })
+      .update({
+        title,
+        is_dynamic: isDynamic,
+        destination,
+        content,
+        style,
+        target_mode: targetMode,
+      })
       .eq("id", code.id)
       .select()
       .single();
@@ -154,15 +175,83 @@ export default function CodeEditor({
         </div>
 
         {isDynamic ? (
-          <label className="block">
-            <span className="text-xs text-[var(--muted)]">Destination URL</span>
-            <input
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
-              placeholder="https://example.com/landing"
-              className="input w-full mt-1"
-            />
-          </label>
+          <div className="space-y-2">
+            {listing && (
+              <div className="flex gap-2 text-sm">
+                <label
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition flex-1 ${
+                    targetMode === "listing_page"
+                      ? "border-violet-300 bg-violet-50 text-violet-700"
+                      : "border-[var(--border)] text-[var(--muted)]"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    checked={targetMode === "listing_page"}
+                    onChange={() => setTargetMode("listing_page")}
+                    className="accent-violet-600"
+                  />
+                  Property page
+                </label>
+                <label
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition flex-1 ${
+                    targetMode === "url"
+                      ? "border-violet-300 bg-violet-50 text-violet-700"
+                      : "border-[var(--border)] text-[var(--muted)]"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    checked={targetMode === "url"}
+                    onChange={() => setTargetMode("url")}
+                    className="accent-violet-600"
+                  />
+                  Custom URL
+                </label>
+              </div>
+            )}
+
+            {listing && targetMode === "listing_page" ? (
+              <>
+                {listing.page_enabled && listing.slug ? (
+                  <p className="text-[11px] text-[var(--muted)] bg-violet-50 rounded-lg px-3 py-2">
+                    Resolves to{" "}
+                    <span className="font-medium">/p/{listing.slug}</span> —
+                    change the page in the listing&apos;s Page tab and every code
+                    follows, no reprint.
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-[11px] text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
+                      This listing&apos;s page isn&apos;t published yet (Page tab).
+                      Until then, scans fall back to the URL below.
+                    </p>
+                    <label className="block">
+                      <span className="text-xs text-[var(--muted)]">
+                        Fallback URL
+                      </span>
+                      <input
+                        value={destination}
+                        onChange={(e) => setDestination(e.target.value)}
+                        placeholder="https://example.com/landing"
+                        className="input w-full mt-1"
+                      />
+                    </label>
+                  </>
+                )}
+              </>
+            ) : (
+              <label className="block">
+                <span className="text-xs text-[var(--muted)]">Destination URL</span>
+                <input
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                  placeholder="https://example.com/landing"
+                  className="input w-full mt-1"
+                />
+              </label>
+            )}
+          </div>
         ) : (
           <label className="block">
             <span className="text-xs text-[var(--muted)]">Static content</span>

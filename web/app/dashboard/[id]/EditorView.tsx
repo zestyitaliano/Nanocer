@@ -6,7 +6,13 @@ import { createClient } from "@/lib/supabase/client";
 import CodeEditor from "@/components/CodeEditor";
 import type { QrCode } from "@/lib/types";
 
-export type ListingOption = { id: string; name: string; address: string | null };
+export type ListingOption = {
+  id: string;
+  name: string;
+  address: string | null;
+  slug: string | null;
+  page_enabled: boolean;
+};
 
 export default function EditorView({
   code,
@@ -68,6 +74,7 @@ export default function EditorView({
           <CodeEditor
             code={code}
             userId={userId}
+            listing={listings.find((l) => l.id === listingId) ?? null}
             onSaved={() => router.refresh()}
             onDeleted={back}
           />

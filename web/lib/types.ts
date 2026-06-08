@@ -32,6 +32,8 @@ export interface QrCode {
   style: QrStyle;
   scan_count: number;
   listing_id: string | null;
+  // 'url' = fixed destination; 'listing_page' = resolve to its listing's page
+  target_mode: "url" | "listing_page";
   created_at: string;
   updated_at: string;
 }

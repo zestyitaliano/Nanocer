@@ -21,7 +21,7 @@ export default async function EditorPage({
     supabase.from("codes").select("*").eq("id", id).maybeSingle(),
     supabase
       .from("listings")
-      .select("id, name, address")
+      .select("id, name, address, slug, page_enabled")
       .order("created_at", { ascending: false }),
   ]);
   if (!code) notFound(); // RLS also hides other users' codes
