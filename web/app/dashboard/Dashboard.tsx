@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { newShortCode } from "@/lib/shortcode";
 import { DEFAULT_STYLE, encodedValue, type QrCode } from "@/lib/types";
-import { fetchBatchZip, downloadBlob, siteUrl } from "@/lib/api";
+import { generateBlob, downloadBlob } from "@/lib/qr-styling";
+import { siteUrl } from "@/lib/api";
+import JSZip from "jszip";
 import CodeEditor from "@/components/CodeEditor";
 
 export default function Dashboard({
@@ -115,13 +117,14 @@ export default function Dashboard({
     if (!codes.length) return;
     setBusy(true);
     try {
-      const items = codes.map((c) => ({
-        filename: `${(c.title || c.short_code).replace(/\s+/g, "_")}_${c.short_code}`,
-        value: encodedValue(c, siteUrl()),
-        style: c.style,
-      }));
-      const blob = await fetchBatchZip(items, "png");
-      downloadBlob(blob, "nanocer_qr_codes.zip");
+      const zip = new JSZip();
+      for (const c of codes) {
+        const name = `${(c.title || c.short_code).replace(/\s+/g, "_")}_${c.short_code}.png`;
+        const blob = await generateBlob(encodedValue(c, siteUrl()), c.style, "png");
+        zip.file(name, blob);
+      }
+      const content = await zip.generateAsync({ type: "blob" });
+      downloadBlob(content, "nanocer_qr_codes.zip");
     } catch (err) {
       alert(err instanceof Error ? err.message : "Batch export failed");
     } finally {

@@ -9,7 +9,8 @@ import {
   type QrCode,
   type QrStyle,
 } from "@/lib/types";
-import { fetchQrBlob, downloadBlob, siteUrl } from "@/lib/api";
+import { generateBlob, downloadBlob } from "@/lib/qr-styling";
+import { siteUrl } from "@/lib/api";
 import QrPreview from "./QrPreview";
 import Analytics from "./Analytics";
 
@@ -97,7 +98,7 @@ export default function CodeEditor({
     setBusy(format);
     setMsg(null);
     try {
-      const blob = await fetchQrBlob(value, style, format);
+      const blob = await generateBlob(value, style, format);
       downloadBlob(blob, `${(title || code.short_code).replace(/\s+/g, "_")}.${format}`);
     } catch (err) {
       setMsg(err instanceof Error ? err.message : "Export failed");
@@ -295,8 +296,8 @@ export default function CodeEditor({
         <div>
           <QrPreview value={value} style={style} />
           <p className="text-[11px] text-neutral-400 mt-1">
-            Live preview is approximate; exported files are rendered precisely by
-            the server.
+            The downloaded file uses the same renderer as this preview, so they
+            match exactly.
           </p>
         </div>
         <div className="border-t pt-4">

@@ -1,21 +1,10 @@
 "use client";
 
-// Instant client-side preview using qr-code-styling. This is an APPROXIMATION:
-// the authoritative download comes from the Render service (which honours all six
-// module shapes exactly). Loaded lazily in the browser to avoid SSR DOM access.
+// Live preview using qr-code-styling. Shares buildOptions() with the export path
+// (lib/qr-styling.ts), so the preview matches the downloaded file exactly.
 import { useEffect, useRef } from "react";
-import type { Options, DotType } from "qr-code-styling";
-import type { QrStyle, ModuleStyle } from "@/lib/types";
-
-// Map our module styles to qr-code-styling dot types (best-effort).
-const DOT_TYPE: Record<ModuleStyle, DotType> = {
-  square: "square",
-  rounded: "rounded",
-  circle: "dots",
-  gapped: "square",
-  vertical: "classy",
-  horizontal: "classy-rounded",
-};
+import { buildOptions } from "@/lib/qr-styling";
+import type { QrStyle } from "@/lib/types";
 
 export default function QrPreview({
   value,
@@ -27,26 +16,9 @@ export default function QrPreview({
   size?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  // qr-code-styling instance (typed loosely; lib has no bundled types we rely on)
   const qrRef = useRef<{ append: (el: HTMLElement) => void; update: (o: object) => void } | null>(null);
 
-  const options: Partial<Options> = {
-    width: size,
-    height: size,
-    type: "canvas",
-    data: value || " ",
-    margin: style.border * 2,
-    qrOptions: {
-      errorCorrectionLevel: style.logo_url ? "H" : style.error_correction,
-    },
-    dotsOptions: {
-      color: style.fill_color,
-      type: DOT_TYPE[style.module_style] ?? "square",
-    },
-    backgroundOptions: { color: style.back_color },
-    image: style.logo_url || undefined,
-    imageOptions: { crossOrigin: "anonymous", imageSize: style.logo_scale, margin: 4 },
-  };
+  const options = buildOptions(value, style, size, "canvas");
 
   // Create once.
   useEffect(() => {
