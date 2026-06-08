@@ -4,32 +4,35 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import CodeEditor from "@/components/CodeEditor";
-import type { QrCode, Folder } from "@/lib/types";
+import type { QrCode } from "@/lib/types";
+
+export type ListingOption = { id: string; name: string; address: string | null };
 
 export default function EditorView({
   code,
-  folders,
+  listings,
   userId,
 }: {
   code: QrCode;
-  folders: Folder[];
+  listings: ListingOption[];
   userId: string;
 }) {
   const router = useRouter();
   const supabase = createClient();
-  const [folderId, setFolderId] = useState<string | null>(code.folder_id);
+  const [listingId, setListingId] = useState<string | null>(code.listing_id);
 
   function back() {
-    router.push("/dashboard");
+    if (listingId) router.push(`/dashboard/listing/${listingId}`);
+    else router.push("/dashboard");
     router.refresh();
   }
 
-  async function changeFolder(v: string) {
-    const fid = v === "" ? null : v;
-    setFolderId(fid);
+  async function changeListing(v: string) {
+    const lid = v === "" ? null : v;
+    setListingId(lid);
     const { error } = await supabase
       .from("codes")
-      .update({ folder_id: fid })
+      .update({ listing_id: lid })
       .eq("id", code.id);
     if (error) alert(error.message);
   }
@@ -38,23 +41,23 @@ export default function EditorView({
     <main className="min-h-screen bg-neutral-50">
       <header className="bg-white border-b px-4 py-3 flex items-center gap-3">
         <button onClick={back} className="text-blue-600 text-sm font-medium">
-          ← Dashboard
+          ← Back
         </button>
         <span className="text-neutral-300">/</span>
         <span className="text-sm font-medium truncate">
           {code.title || code.short_code}
         </span>
         <div className="ml-auto flex items-center gap-2">
-          <label className="text-xs text-neutral-500">Folder</label>
+          <label className="text-xs text-neutral-500">Listing</label>
           <select
-            value={folderId ?? ""}
-            onChange={(e) => changeFolder(e.target.value)}
-            className="border rounded-lg px-2 py-1 text-sm"
+            value={listingId ?? ""}
+            onChange={(e) => changeListing(e.target.value)}
+            className="border rounded-lg px-2 py-1 text-sm max-w-[220px]"
           >
-            <option value="">Unfiled</option>
-            {folders.map((f) => (
-              <option key={f.id} value={f.id}>
-                {f.name}
+            <option value="">Unassigned (General)</option>
+            {listings.map((l) => (
+              <option key={l.id} value={l.id}>
+                {l.name || l.address || "(untitled)"}
               </option>
             ))}
           </select>

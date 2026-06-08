@@ -31,16 +31,51 @@ export interface QrCode {
   content: string;
   style: QrStyle;
   scan_count: number;
-  folder_id: string | null;
+  listing_id: string | null;
   created_at: string;
   updated_at: string;
 }
 
-export interface Folder {
+export type ListingStatus =
+  | "coming_soon"
+  | "active"
+  | "under_contract"
+  | "sold"
+  | "other";
+
+export const LISTING_STATUSES: { value: ListingStatus; label: string }[] = [
+  { value: "coming_soon", label: "Coming soon" },
+  { value: "active", label: "Active" },
+  { value: "under_contract", label: "Under contract" },
+  { value: "sold", label: "Sold" },
+  { value: "other", label: "Other" },
+];
+
+export const STATUS_LABEL: Record<ListingStatus, string> = {
+  coming_soon: "Coming soon",
+  active: "Active",
+  under_contract: "Under contract",
+  sold: "Sold",
+  other: "Other",
+};
+
+export interface Listing {
   id: string;
   user_id: string;
   name: string;
+  status: ListingStatus;
+  address: string | null;
+  price: number | null;
+  beds: number | null;
+  baths: number | null;
+  sqft: number | null;
+  description: string | null;
+  slug: string | null;
+  template: string;
+  page_enabled: boolean;
+  page_config: Record<string, unknown>;
   created_at: string;
+  updated_at: string;
 }
 
 export const DEFAULT_STYLE: QrStyle = {
