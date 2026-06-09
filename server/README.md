@@ -12,8 +12,28 @@ is off the latency-critical path (Render's free tier sleeps when idle).
 | GET | `/health` | — | `{"status":"ok"}` |
 | POST | `/render` | `{value, style, format:"png"\|"svg"}` | image bytes |
 | POST | `/batch` | `{items:[{filename,value,style}], format}` | `application/zip` |
+| POST | `/brochure` | `{listing, floor_plans, photos, theme, agent, landing_url}` | `application/pdf` |
 
 `style.logo_url` (a public Supabase Storage URL) is fetched and embedded for PNG.
+
+## Brochure PDF
+
+`/brochure` renders a listing into a print-ready PDF with [WeasyPrint](https://weasyprint.org/).
+The web app assembles the payload (it already fetches the listing + floor plans),
+so this service stays DB-free. Images are pre-fetched and embedded; a broken
+image URL is skipped, not fatal. The endpoint imports WeasyPrint lazily and
+returns **501** if it (or its system libs) is unavailable — `/render` and
+`/batch` are unaffected.
+
+WeasyPrint needs system libraries (Pango, Cairo, GDK-PixBuf, libffi):
+
+- **Debian/Ubuntu (Render default):** `apt-get install -y libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf-2.0-0 libffi-dev libcairo2`
+- **macOS:** `brew install pango gdk-pixbuf libffi`
+- **Windows (local):** install the GTK runtime (see WeasyPrint docs).
+
+On Render's native (non-Docker) Python runtime these libs may be unavailable; if
+so, deploy the service via a Dockerfile that installs them, or leave `/brochure`
+returning 501 (the web app surfaces a friendly error and the rest works).
 
 ## Run locally
 

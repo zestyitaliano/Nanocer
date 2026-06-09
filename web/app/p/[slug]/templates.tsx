@@ -3,11 +3,12 @@
 // + leads + analytics apply everywhere).
 import type { Listing, PageConfig } from "@/lib/types";
 import LeadForm from "./LeadForm";
+import { transformUrl } from "@/lib/image";
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main className="min-h-screen sm:py-6">
-      <div className="max-w-md mx-auto bg-white min-h-screen sm:min-h-0 sm:rounded-3xl sm:shadow-[var(--shadow-md)] overflow-hidden">
+      <div className="max-w-md mx-auto bg-white min-h-screen sm:min-h-0 sm:rounded-lg sm:border sm:border-[var(--border)] overflow-hidden">
         {children}
       </div>
     </main>
@@ -47,13 +48,13 @@ export function AgentTemplate({
   const title = agent.name || listing.name || listing.address || "Contact";
   const cta = cfg.cta;
   const btn =
-    "block text-center text-white rounded-xl py-3 text-sm font-semibold shadow-sm";
+    "block text-center text-white rounded py-3 text-sm font-semibold";
   return (
     <Shell>
       <div className="p-6 flex flex-col items-center text-center gap-3">
         {agent.photo_url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={agent.photo_url} alt={title} className="w-24 h-24 rounded-full object-cover shadow-sm" />
+          <img src={transformUrl(agent.photo_url, { width: 192 })} alt={title} loading="lazy" decoding="async" className="w-24 h-24 rounded-full object-cover" />
         ) : (
           <div className="w-24 h-24 rounded-full grid place-items-center text-2xl font-bold text-white" style={{ background: accent }}>
             {title.slice(0, 1).toUpperCase()}
@@ -78,11 +79,11 @@ export function AgentTemplate({
             </a>
           )}
           {agent.email && (
-            <a href={`mailto:${agent.email}`} className="block text-center rounded-xl py-3 text-sm font-semibold border" style={{ borderColor: accent, color: accent }}>
+            <a href={`mailto:${agent.email}`} className="block text-center rounded py-3 text-sm font-semibold border" style={{ borderColor: accent, color: accent }}>
               ✉️ Email
             </a>
           )}
-          <a href={vcardHref(agent, title)} download="contact.vcf" className="block text-center rounded-xl py-3 text-sm font-semibold border" style={{ borderColor: accent, color: accent }}>
+          <a href={vcardHref(agent, title)} download="contact.vcf" className="block text-center rounded py-3 text-sm font-semibold border" style={{ borderColor: accent, color: accent }}>
             Save contact
           </a>
           {cta?.value && cta.type === "link" && (
@@ -117,11 +118,11 @@ export function OpenHouseTemplate({
     <Shell>
       {photos[0] ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={photos[0]} alt={title} className="w-full aspect-[4/3] object-cover" />
+        <img src={transformUrl(photos[0], { width: 1080 })} alt={title} loading="lazy" decoding="async" className="w-full aspect-[4/3] object-cover" />
       ) : null}
       <div className="p-5 space-y-4">
         <div>
-          <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-1.5 bg-orange-100 text-orange-800">
+          <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded mb-1.5 bg-orange-100 text-orange-800">
             Open house
           </span>
           <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
@@ -161,11 +162,11 @@ export function ComingSoonTemplate({
     <Shell>
       {photos[0] ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={photos[0]} alt={title} className="w-full aspect-[4/3] object-cover" />
+        <img src={transformUrl(photos[0], { width: 1080 })} alt={title} loading="lazy" decoding="async" className="w-full aspect-[4/3] object-cover" />
       ) : null}
       <div className="p-5 space-y-4">
         <div>
-          <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-1.5 bg-amber-100 text-amber-800">
+          <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded mb-1.5 bg-amber-100 text-amber-800">
             Coming soon
           </span>
           <h1 className="text-2xl font-bold tracking-tight">{title}</h1>

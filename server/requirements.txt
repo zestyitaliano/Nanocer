@@ -4,3 +4,7 @@ fastapi>=0.110.0
 uvicorn[standard]>=0.29.0
 httpx>=0.27.0
 pydantic>=2.6.0
+# /brochure PDF generation. Needs system libs (pango, cairo, gdk-pixbuf) — see
+# README "Brochure PDF". The /brochure endpoint imports this lazily, so /render
+# and /batch still work if it (or its system deps) is missing.
+weasyprint>=62

@@ -6,6 +6,7 @@ database — the web app owns all data; this service only renders. Endpoints:
     GET  /health
     POST /render   {value, style, format: "png"|"svg"}        -> image bytes
     POST /batch    {items: [{filename, value, style}], format} -> application/zip
+    POST /brochure {listing, floor_plans, photos, theme, ...}  -> application/pdf
 
 Centre logos are passed as `style.logo_url` (a public Supabase Storage URL); the
 service fetches the image and embeds it. CORS is locked to ALLOWED_ORIGIN.
@@ -27,6 +28,7 @@ from pydantic import BaseModel, Field
 import qr_render
 
 ALLOWED_ORIGIN = os.environ.get("ALLOWED_ORIGIN", "*")
+BROCHURE_MAX_PLANS = 60  # generous cap to bound render time
 LOGO_MAX_BYTES = 5 * 1024 * 1024  # 5 MB cap on fetched logos
 
 app = FastAPI(title="Nanocer Render Service")
@@ -53,6 +55,15 @@ class BatchItem(BaseModel):
 class BatchRequest(BaseModel):
     items: list[BatchItem] = Field(..., max_length=500)
     format: Literal["png", "svg"] = "png"
+
+
+class BrochureRequest(BaseModel):
+    listing: dict[str, Any] = Field(default_factory=dict)
+    floor_plans: list[dict[str, Any]] = Field(default_factory=list)
+    photos: list[str] = Field(default_factory=list)
+    theme: dict[str, Any] = Field(default_factory=dict)
+    agent: dict[str, Any] = Field(default_factory=dict)
+    landing_url: Optional[str] = None
 
 
 def _fetch_logo(style: dict[str, Any]) -> Optional[Image.Image]:
@@ -110,4 +121,32 @@ def batch(req: BatchRequest):
     return StreamingResponse(
         buf, media_type="application/zip",
         headers={"Content-Disposition": 'attachment; filename="nanocer_qr_codes.zip"'},
+    )
+
+
+def _slugify_filename(name: str) -> str:
+    safe = "".join(c if c.isalnum() or c in "-_" else "-" for c in name).strip("-")
+    return (safe or "brochure").lower()[:60]
+
+
+@app.post("/brochure")
+def brochure(req: BrochureRequest):
+    import brochure as brochure_mod
+
+    payload = req.model_dump()
+    payload["floor_plans"] = payload.get("floor_plans", [])[:BROCHURE_MAX_PLANS]
+    try:
+        data = brochure_mod.render_pdf(payload)
+    except (ImportError, OSError) as exc:
+        # WeasyPrint or its system libs (pango/cairo/…) aren't available here.
+        # /render and /batch are unaffected. See server/README "Brochure PDF".
+        raise HTTPException(status_code=501, detail=f"brochure unavailable: {exc}")
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=400, detail=f"brochure failed: {exc}")
+
+    fname = _slugify_filename(str(req.listing.get("name") or "brochure"))
+    return Response(
+        content=data,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{fname}.pdf"'},
     )

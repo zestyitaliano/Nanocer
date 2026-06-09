@@ -3,7 +3,9 @@
 // Lead capture for public property pages. Writes via the service-role admin
 // client (no public insert policy on leads), and validates the listing's page
 // is published before accepting.
+import { after } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { notifyNewLead } from "@/lib/notify/lead";
 
 export async function submitLead(input: {
   listingId: string;
@@ -60,14 +62,24 @@ export async function submitLead(input: {
     input.message?.trim() || null,
   ].filter(Boolean);
 
-  const { error } = await admin.from("leads").insert({
-    listing_id: input.listingId,
-    name: input.name.trim(),
-    phone: input.phone.trim(),
-    email: input.email?.trim() || null,
-    message: parts.length ? parts.join("\n") : null,
-    source: input.quizSummary?.trim() ? "quiz" : "page",
-  });
+  const { data: lead, error } = await admin
+    .from("leads")
+    .insert({
+      listing_id: input.listingId,
+      name: input.name.trim(),
+      phone: input.phone.trim(),
+      email: input.email?.trim() || null,
+      message: parts.length ? parts.join("\n") : null,
+      source: input.quizSummary?.trim() ? "quiz" : "page",
+    })
+    .select("id")
+    .single();
   if (error) return { ok: false, error: error.message };
+
+  // Notify the owner after the response is sent. Best-effort — notifyNewLead
+  // swallows its own errors, so a failed email never affects the submission.
+  if (lead?.id) {
+    after(() => notifyNewLead(input.listingId, lead.id));
+  }
   return { ok: true };
 }

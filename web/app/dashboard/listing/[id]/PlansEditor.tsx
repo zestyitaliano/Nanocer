@@ -7,6 +7,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { newShortCode } from "@/lib/shortcode";
+import { transformUrl } from "@/lib/image";
+import { syncedLabel } from "@/lib/listing";
 import {
   DEFAULT_STYLE,
   type FloorPlan,
@@ -33,6 +35,11 @@ interface DraftPlan {
   ctaType: CtaType;
   ctaLabel: string;
   ctaValue: string;
+  // Sync provenance (display + pin toggle). Not written by toRow, so manual
+  // field edits never clobber them.
+  source?: "manual" | "sync";
+  sync_enabled: boolean;
+  last_synced_at?: string | null;
 }
 
 const splitTags = (s: string) =>
@@ -57,6 +64,9 @@ function toDraft(p: FloorPlan): DraftPlan {
     ctaType: (p.cta?.type as CtaType) ?? "none",
     ctaLabel: p.cta?.label ?? "",
     ctaValue: p.cta?.value ?? "",
+    source: p.source,
+    sync_enabled: p.sync_enabled ?? true,
+    last_synced_at: p.last_synced_at ?? null,
   };
 }
 
@@ -152,6 +162,20 @@ export default function PlansEditor({
     setPlans((prev) => prev.map((x) => (x.id === id ? { ...x, ...p } : x)));
   }
 
+  // Pin / unpin a synced plan: sync_enabled=false stops future syncs from
+  // touching it (lets an operator keep a manual override).
+  async function setPinned(id: string, pinned: boolean) {
+    patch(id, { sync_enabled: !pinned });
+    const { error } = await supabase
+      .from("floor_plans")
+      .update({ sync_enabled: !pinned })
+      .eq("id", id);
+    if (error) {
+      patch(id, { sync_enabled: pinned });
+      setMsg(error.message);
+    }
+  }
+
   // Persist one plan's fields (called on blur / after photo + select changes).
   async function persist(id: string) {
     const d = plans.find((x) => x.id === id);
@@ -238,7 +262,26 @@ export default function PlansEditor({
       </div>
 
       {plans.map((p, i) => (
-        <div key={p.id} className="border border-[var(--border)] rounded-xl p-3 space-y-2 bg-neutral-50/70">
+        <div key={p.id} className="border border-[var(--border)] rounded-lg p-3 space-y-2 bg-neutral-50/70">
+          {p.source === "sync" && (
+            <div className="flex items-center gap-2 text-xs">
+              <span className="inline-flex items-center gap-1 font-semibold px-2 py-0.5 rounded bg-sky-100 text-sky-800">
+                ⟳ {syncedLabel({ source: p.source, last_synced_at: p.last_synced_at } as FloorPlan)}
+              </span>
+              <label className="flex items-center gap-1 text-[var(--muted)]">
+                <input
+                  type="checkbox"
+                  checked={!p.sync_enabled}
+                  onChange={(e) => setPinned(p.id, e.target.checked)}
+                  className="accent-orange-600"
+                />
+                Pin (stop syncing)
+              </label>
+              {p.sync_enabled && (
+                <span className="text-[var(--muted)]">Synced fields are overwritten on next sync.</span>
+              )}
+            </div>
+          )}
           <div className="flex items-center gap-2">
             <input
               className="input flex-1"
@@ -297,10 +340,10 @@ export default function PlansEditor({
               {p.photos.map((src, j) => (
                 <div key={j} className="relative">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt="" className="w-14 h-14 object-cover rounded border border-[var(--border)]" />
+                  <img src={transformUrl(src, { width: 128 })} alt="" loading="lazy" decoding="async" className="w-14 h-14 object-cover rounded border border-[var(--border)]" />
                   <button
                     onClick={() => removePhoto(p.id, j)}
-                    className="absolute -top-1.5 -right-1.5 bg-white border border-[var(--border)] shadow-sm rounded-full w-5 h-5 text-xs text-red-500 grid place-items-center"
+                    className="absolute -top-1.5 -right-1.5 bg-white border border-[var(--border)] rounded-full w-5 h-5 text-xs text-red-500 grid place-items-center"
                   >
                     ✕
                   </button>

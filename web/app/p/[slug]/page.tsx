@@ -15,6 +15,7 @@ import {
 import LeadForm from "./LeadForm";
 import PropertyQuiz from "./PropertyQuiz";
 import Gallery from "@/components/Gallery";
+import { transformUrl } from "@/lib/image";
 
 async function getFloorPlans(listingId: string): Promise<FloorPlan[]> {
   const admin = createAdminClient();
@@ -40,7 +41,7 @@ function PlanCard({ plan, accent }: { plan: FloorPlan; accent: string }) {
   return (
     <div
       id={`fp-${plan.id}`}
-      className="border border-[var(--border)] rounded-2xl overflow-hidden shadow-sm scroll-mt-4 target:ring-2 target:ring-orange-400"
+      className="border border-[var(--border)] rounded-lg overflow-hidden scroll-mt-4 target:ring-2 target:ring-orange-400"
     >
       <Gallery
         images={plan.photos?.length ? plan.photos : plan.photo_url ? [plan.photo_url] : []}
@@ -49,7 +50,7 @@ function PlanCard({ plan, accent }: { plan: FloorPlan; accent: string }) {
       <div className="p-3 space-y-1.5">
         <div className="flex items-center justify-between gap-2">
           <span className="font-semibold">{plan.name}</span>
-          <span className={`text-[11px] px-1.5 py-0.5 rounded-full shrink-0 ${badge.cls}`}>
+          <span className={`text-[11px] px-1.5 py-0.5 rounded shrink-0 ${badge.cls}`}>
             {badge.text}
           </span>
         </div>
@@ -72,7 +73,7 @@ function PlanCard({ plan, accent }: { plan: FloorPlan; accent: string }) {
             href={cta.value}
             target="_blank"
             rel="noopener noreferrer"
-            className="block text-center text-white rounded-xl py-2 text-sm font-semibold shadow-sm mt-1"
+            className="block text-center text-white rounded py-2 text-sm font-semibold mt-1"
             style={{ background: accent }}
           >
             {cta.label || "Apply"}
@@ -80,7 +81,7 @@ function PlanCard({ plan, accent }: { plan: FloorPlan; accent: string }) {
         ) : cta?.value && cta.type === "text" ? (
           <a
             href={`sms:${cta.value}`}
-            className="block text-center text-white rounded-xl py-2 text-sm font-semibold shadow-sm mt-1"
+            className="block text-center text-white rounded py-2 text-sm font-semibold mt-1"
             style={{ background: accent }}
           >
             {cta.label || "Text me"}
@@ -88,7 +89,7 @@ function PlanCard({ plan, accent }: { plan: FloorPlan; accent: string }) {
         ) : (
           <a
             href="#lead"
-            className="block text-center rounded-xl py-2 text-sm font-semibold mt-1 border"
+            className="block text-center rounded py-2 text-sm font-semibold mt-1 border"
             style={{ borderColor: accent, color: accent }}
           >
             Request info
@@ -141,7 +142,7 @@ export async function generateMetadata({
       description,
       url,
       type: "website",
-      images: photos[0] ? [{ url: photos[0] }] : undefined,
+      images: photos[0] ? [{ url: transformUrl(photos[0], { width: 1200 }) }] : undefined,
     },
   };
 }
@@ -194,7 +195,7 @@ export default async function PropertyPage({
 
   return (
     <main className="min-h-screen sm:py-6">
-      <div className="max-w-md mx-auto bg-white min-h-screen sm:min-h-0 sm:rounded-3xl sm:shadow-[var(--shadow-md)] overflow-hidden">
+      <div className="max-w-md mx-auto bg-white min-h-screen sm:min-h-0 sm:rounded-lg sm:border sm:border-[var(--border)] overflow-hidden">
         {photos.length ? (
           <Gallery images={photos} alt={title} />
         ) : (
@@ -205,7 +206,7 @@ export default async function PropertyPage({
           <div>
             {statusBanner && (
               <span
-                className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-1.5 ${statusBanner.cls}`}
+                className={`inline-block text-xs font-semibold px-2 py-0.5 rounded mb-1.5 ${statusBanner.cls}`}
               >
                 {statusBanner.text}
               </span>
@@ -245,7 +246,7 @@ export default async function PropertyPage({
             <div className="border-t border-[var(--border)] pt-4 flex items-center gap-3">
               {agent.photo_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={agent.photo_url} alt={agent.name ?? "Agent"} className="w-12 h-12 rounded-full object-cover" />
+                <img src={transformUrl(agent.photo_url, { width: 96 })} alt={agent.name ?? "Agent"} loading="lazy" decoding="async" className="w-12 h-12 rounded-full object-cover" />
               ) : null}
               <div className="text-sm">
                 {agent.name && <div className="font-semibold">{agent.name}</div>}
@@ -264,12 +265,12 @@ export default async function PropertyPage({
           )}
 
           {cta?.type === "text" && cta.value && (
-            <a href={`sms:${cta.value}`} className="block text-center text-white rounded-xl py-3 text-sm font-semibold shadow-sm" style={{ background: accent }}>
+            <a href={`sms:${cta.value}`} className="block text-center text-white rounded py-3 text-sm font-semibold" style={{ background: accent }}>
               {cta.label || "Text me"}
             </a>
           )}
           {cta?.type === "link" && cta.value && (
-            <a href={cta.value} target="_blank" rel="noopener noreferrer" className="block text-center text-white rounded-xl py-3 text-sm font-semibold shadow-sm" style={{ background: accent }}>
+            <a href={cta.value} target="_blank" rel="noopener noreferrer" className="block text-center text-white rounded py-3 text-sm font-semibold" style={{ background: accent }}>
               {cta.label || "Learn more"}
             </a>
           )}

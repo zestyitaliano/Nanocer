@@ -13,7 +13,7 @@ export default function Home() {
         }}
       />
       <div className="max-w-xl text-center space-y-7">
-        <span className="chip brand-gradient text-white shadow-sm">
+        <span className="chip brand-gradient text-white">
           ✦ Your own owned ILS
         </span>
         <h1 className="text-5xl font-bold tracking-tight">

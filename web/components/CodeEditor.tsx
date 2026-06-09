@@ -151,7 +151,7 @@ export default function CodeEditor({
 
         <div className="flex gap-2 text-sm">
           <label
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition flex-1 ${
+            className={`flex items-center gap-2 px-3 py-2 rounded border cursor-pointer transition flex-1 ${
               isDynamic
                 ? "border-orange-300 bg-orange-50 text-orange-700"
                 : "border-[var(--border)] text-[var(--muted)]"
@@ -166,7 +166,7 @@ export default function CodeEditor({
             Dynamic (editable later)
           </label>
           <label
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition flex-1 ${
+            className={`flex items-center gap-2 px-3 py-2 rounded border cursor-pointer transition flex-1 ${
               !isDynamic
                 ? "border-orange-300 bg-orange-50 text-orange-700"
                 : "border-[var(--border)] text-[var(--muted)]"
@@ -197,7 +197,7 @@ export default function CodeEditor({
                 ).map(([mode, label]) => (
                   <label
                     key={mode}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition ${
+                    className={`flex items-center gap-2 px-3 py-2 rounded border cursor-pointer transition ${
                       targetMode === mode
                         ? "border-orange-300 bg-orange-50 text-orange-700"
                         : "border-[var(--border)] text-[var(--muted)]"
@@ -306,7 +306,7 @@ export default function CodeEditor({
               type="color"
               value={style.fill_color}
               onChange={(e) => patchStyle({ fill_color: e.target.value })}
-              className="w-full h-10 border border-[var(--border)] rounded-xl mt-1 cursor-pointer"
+              className="w-full h-10 border border-[var(--border)] rounded mt-1 cursor-pointer"
             />
           </label>
           <label className="block">
@@ -315,7 +315,7 @@ export default function CodeEditor({
               type="color"
               value={style.back_color}
               onChange={(e) => patchStyle({ back_color: e.target.value })}
-              className="w-full h-10 border border-[var(--border)] rounded-xl mt-1 cursor-pointer"
+              className="w-full h-10 border border-[var(--border)] rounded mt-1 cursor-pointer"
             />
           </label>
           <label className="block">

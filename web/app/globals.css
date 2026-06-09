@@ -15,12 +15,79 @@
   --brand: #eb5e28;
   --brand-strong: #c9481b;
   --ring: rgba(235, 94, 40, 0.28);
-  --radius: 1rem;
+  /* Sharp "Soft-Technical" radius: 8px large cards, 4px standard elements. */
+  --radius: 0.5rem;
   --shadow-sm: 0 1px 2px rgba(37, 36, 34, 0.05), 0 2px 8px rgba(37, 36, 34, 0.06);
   --shadow-md: 0 8px 28px rgba(37, 36, 34, 0.10);
 
   --background: var(--canvas);
   --foreground: var(--ink);
+}
+
+/* ------------------------------------------------------------------ *
+ * Lumina Nexus reference tokens (from Stitch DESIGN.md)
+ * Canonical values for the design system. Namespaced --lx-* so they
+ * sit ALONGSIDE the shipped tokens above without colliding — migrate
+ * components onto these incrementally, then retire the originals.
+ * Exposed as Tailwind utilities via @theme below (bg-lx-primary, etc.).
+ * ------------------------------------------------------------------ */
+:root {
+  /* Surfaces (warm "paper & ink" foundation) */
+  --lx-paper: #fffcf2;            /* primary canvas — matches shipped --canvas */
+  --lx-surface: #fcf9ef;          /* secondary off-white surface */
+  --lx-container-low: #f6f4ea;
+  --lx-container: #f1eee4;
+  --lx-container-high: #ebe8de;
+  --lx-container-highest: #e5e2d9;
+  --lx-surface-dim: #dcdad0;
+  --lx-container-lowest: #ffffff; /* card surface */
+
+  /* Ink / text */
+  --lx-ink: #252422;              /* black — matches shipped --ink */
+  --lx-on-surface: #1c1c16;
+  --lx-on-surface-variant: #594139;
+  --lx-charcoal: #403d39;         /* secondary text / lifted backgrounds */
+  --lx-inverse-surface: #31312a;
+  --lx-inverse-on-surface: #f4f1e7;
+
+  /* Brand orange — note TWO oranges in the system */
+  --lx-accent: #eb5e28;           /* high-energy CTA accent (primary buttons) */
+  --lx-primary: #a73400;          /* deep burnt — Material "primary" role */
+  --lx-primary-container: #cc4811;
+  --lx-surface-tint: #ab3600;
+  --lx-inverse-primary: #ffb59c;
+
+  /* Lines */
+  --lx-silver: #ccc5b9;           /* Level-1 card border (1px, no shadow) */
+  --lx-outline: #8d7168;
+  --lx-outline-variant: #e1bfb4;
+
+  /* Secondary / tertiary */
+  --lx-secondary: #605e5b;
+  --lx-secondary-container: #e6e2de;
+  --lx-tertiary: #5f5b57;
+
+  /* Semantic */
+  --lx-error: #ba1a1a;
+  --lx-error-container: #ffdad6;
+  --lx-on-error-container: #93000a;
+
+  /* Radius — "Soft-Technical": SHARP, not pill */
+  --lx-radius-sm: 0.125rem;       /* 2px */
+  --lx-radius: 0.25rem;           /* 4px — standard buttons/inputs/small cards */
+  --lx-radius-md: 0.375rem;       /* 6px */
+  --lx-radius-lg: 0.5rem;         /* 8px — large containers/cards */
+  --lx-radius-xl: 0.75rem;        /* 12px */
+
+  /* Type scale (DM Sans UI/marketing · Geist Mono technical labels) */
+  --lx-text-headline-xl: 700 48px/56px var(--font-dm-sans);   /* -0.02em */
+  --lx-text-headline-lg: 700 32px/40px var(--font-dm-sans);   /* -0.01em */
+  --lx-text-headline-md: 600 24px/32px var(--font-dm-sans);
+  --lx-text-body-lg: 400 18px/28px var(--font-dm-sans);
+  --lx-text-body-md: 400 16px/24px var(--font-dm-sans);
+  --lx-text-label-mono: 500 14px/20px var(--font-geist-mono); /* 0.02em */
+  --lx-text-label-mono-sm: 500 12px/16px var(--font-geist-mono);
+  --lx-text-caption: 500 12px/16px var(--font-dm-sans);
 }
 
 @theme inline {
@@ -31,6 +98,31 @@
   --font-sans: var(--font-dm-sans);
   --font-display: var(--font-dm-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Lumina Nexus palette → Tailwind utilities (bg-lx-*, text-lx-*, border-lx-*) */
+  --color-lx-paper: var(--lx-paper);
+  --color-lx-surface: var(--lx-surface);
+  --color-lx-card: var(--lx-container-lowest);
+  --color-lx-ink: var(--lx-ink);
+  --color-lx-on-surface: var(--lx-on-surface);
+  --color-lx-on-surface-variant: var(--lx-on-surface-variant);
+  --color-lx-charcoal: var(--lx-charcoal);
+  --color-lx-accent: var(--lx-accent);
+  /* Deep-primary (#a73400/#cc4811) intentionally NOT exposed — single-accent
+   * decision: #eb5e28 is the only brand orange. Raw --lx-primary* kept above
+   * for design-system reference only. */
+  --color-lx-silver: var(--lx-silver);
+  --color-lx-outline: var(--lx-outline);
+  --color-lx-outline-variant: var(--lx-outline-variant);
+  --color-lx-secondary: var(--lx-secondary);
+  --color-lx-error: var(--lx-error);
+
+  /* Sharp radius scale → rounded-lx-* */
+  --radius-lx-sm: var(--lx-radius-sm);
+  --radius-lx: var(--lx-radius);
+  --radius-lx-md: var(--lx-radius-md);
+  --radius-lx-lg: var(--lx-radius-lg);
+  --radius-lx-xl: var(--lx-radius-xl);
 }
 
 body {
@@ -77,34 +169,35 @@ body {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
+    /* Flat: depth comes from the 1px outline + tonal surface, not shadow. */
   }
   .card-hover {
-    transition: box-shadow 0.18s ease, transform 0.18s ease;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
   }
   .card-hover:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+    /* Tactile via color shift, not lift. */
+    border-color: var(--lx-outline);
+    background: var(--lx-surface);
   }
 
   /* Inputs --------------------------------------------------------- */
   .input {
     background: #fff;
     border: 1px solid var(--border);
-    border-radius: 0.75rem;
+    border-radius: var(--lx-radius); /* 4px — sharp */
     padding: 0.55rem 0.8rem;
     font-size: 0.875rem;
     font-family: inherit;
     color: var(--ink);
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition: border-color 0.15s;
   }
   .input::placeholder {
     color: #a9a8b4;
   }
   .input:focus {
+    /* Flat focus: 1px accent border, no glow. */
     outline: none;
     border-color: var(--brand);
-    box-shadow: 0 0 0 3px var(--ring);
   }
 
   /* Buttons -------------------------------------------------------- */
@@ -113,7 +206,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
-    border-radius: 9999px;
+    border-radius: var(--lx-radius); /* 4px — sharp, never pill */
     font-family: inherit;
     font-size: 0.875rem;
     font-weight: 600;
@@ -136,12 +229,12 @@ body {
     font-size: 0.8rem;
   }
   .btn-primary {
+    /* Solid accent fill; tactile via color shift on hover, no glow. */
     color: #fff;
-    background-image: linear-gradient(135deg, #f5793a, #d24e1d);
-    box-shadow: 0 6px 16px rgba(235, 94, 40, 0.3);
+    background-color: var(--brand);
   }
   .btn-primary:hover:not(:disabled) {
-    box-shadow: 0 9px 22px rgba(235, 94, 40, 0.42);
+    background-color: var(--brand-strong);
   }
   .btn-secondary {
     background: #fff;
@@ -151,6 +244,14 @@ body {
   .btn-secondary:hover:not(:disabled) {
     background: #fbf6ee;
     border-color: #e0d8c8;
+  }
+  /* Ink — solid charcoal/black for admin & secondary technical actions. */
+  .btn-ink {
+    background: var(--ink);
+    color: var(--lx-paper);
+  }
+  .btn-ink:hover:not(:disabled) {
+    background: var(--lx-charcoal);
   }
   .btn-danger {
     background: #fff;
@@ -166,10 +267,65 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    border-radius: 9999px;
+    border-radius: var(--lx-radius); /* 4px — rectangular tag, not pill */
     font-size: 0.7rem;
     font-weight: 600;
     padding: 0.22rem 0.6rem;
     line-height: 1.1;
+  }
+
+  /* Type scale (Lumina Nexus) -------------------------------------- *
+   * Named steps as reusable classes. DM Sans for UI/marketing,
+   * Geist Mono for technical labels & metadata. */
+  .text-headline-xl {
+    font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 56px;
+    letter-spacing: -0.02em;
+  }
+  .text-headline-lg {
+    font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 40px;
+    letter-spacing: -0.01em;
+  }
+  .text-headline-md {
+    font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 32px;
+  }
+  .text-body-lg {
+    font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 28px;
+  }
+  .text-body-md {
+    font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+  }
+  .label-mono {
+    font-family: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: 0.02em;
+  }
+  .label-mono-sm {
+    font-family: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+  }
+  .text-caption {
+    font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
   }
 }

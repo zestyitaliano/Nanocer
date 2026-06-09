@@ -42,6 +42,18 @@ export function summaryRange(plans: FloorPlan[]): string {
   return parts.join(" · ");
 }
 
+// Short "Synced 2h ago" label for a sync-owned plan, or null for manual plans.
+export function syncedLabel(plan: FloorPlan): string | null {
+  if (plan.source !== "sync") return null;
+  if (!plan.last_synced_at) return "Synced";
+  const mins = Math.round((Date.now() - new Date(plan.last_synced_at).getTime()) / 60000);
+  if (mins < 1) return "Synced just now";
+  if (mins < 60) return `Synced ${mins}m ago`;
+  const hrs = Math.round(mins / 60);
+  if (hrs < 24) return `Synced ${hrs}h ago`;
+  return `Synced ${Math.round(hrs / 24)}d ago`;
+}
+
 export const AVAILABILITY_BADGE: Record<
   NonNullable<FloorPlan["availability"]>,
   { text: string; cls: string }

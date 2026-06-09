@@ -18,9 +18,10 @@ import { statusColor } from "@/components/ListingCard";
 import QrThumb from "@/components/QrThumb";
 import PageTab from "./PageTab";
 import LeadsTab from "./LeadsTab";
+import TeamTab from "./TeamTab";
 import ListingAnalytics from "./ListingAnalytics";
 
-type Tab = "overview" | "codes" | "page" | "leads" | "analytics";
+type Tab = "overview" | "codes" | "page" | "leads" | "team" | "analytics";
 
 export default function ListingHub({
   listing: initial,
@@ -163,13 +164,13 @@ export default function ListingHub({
 
       <div className="bg-white/70 backdrop-blur border-b border-[var(--border)] px-4 sm:px-6">
         <nav className="flex gap-1 text-sm max-w-4xl mx-auto overflow-x-auto py-2">
-          {(["overview", "codes", "page", "leads", "analytics"] as Tab[]).map((t) => (
+          {(["overview", "codes", "page", "leads", "team", "analytics"] as Tab[]).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-3.5 py-1.5 rounded-full capitalize whitespace-nowrap transition ${
+              className={`px-3.5 py-1.5 rounded capitalize whitespace-nowrap transition ${
                 tab === t
-                  ? "brand-gradient text-white shadow-sm"
+                  ? "brand-gradient text-white"
                   : "text-[var(--muted)] hover:bg-neutral-100"
               }`}
             >
@@ -286,6 +287,8 @@ export default function ListingHub({
         )}
 
         {tab === "leads" && <LeadsTab listingId={listing.id} />}
+
+        {tab === "team" && <TeamTab listingId={listing.id} userId={userId} />}
 
         {tab === "analytics" && (
           <ListingAnalytics

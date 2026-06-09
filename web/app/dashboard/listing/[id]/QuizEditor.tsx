@@ -142,7 +142,7 @@ export default function QuizEditor({
             {draft.questions.map((q, qi) => (
               <div
                 key={q.id}
-                className="border border-[var(--border)] rounded-xl p-3 space-y-2 bg-neutral-50/70"
+                className="border border-[var(--border)] rounded-lg p-3 space-y-2 bg-neutral-50/70"
               >
                 <div className="flex items-center gap-2">
                   <input

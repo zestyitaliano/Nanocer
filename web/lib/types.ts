@@ -101,6 +101,49 @@ export interface FloorPlan {
   description?: string;
   tags?: string[];
   cta?: CtaConfig; // per-plan apply / waitlist / tour button
+  // Sync provenance (added in 0012_plan_sync). 'manual' rows are never touched
+  // by a sync; 'sync' rows can be pinned with sync_enabled=false.
+  source?: PlanSource;
+  external_id?: string | null;
+  sync_enabled?: boolean;
+  last_synced_at?: string | null;
+  synced_fields?: string[];
+}
+
+export type PlanSource = "manual" | "sync";
+
+// Per-listing sync config (table: listing_sync_sources).
+export type SyncKind = "webhook" | "csv_url";
+
+export interface ListingSyncSource {
+  id: string;
+  listing_id: string;
+  user_id: string;
+  kind: SyncKind;
+  enabled: boolean;
+  webhook_secret: string;
+  feed_url: string | null;
+  synced_fields: string[];
+  last_synced_at: string | null;
+  last_status: "ok" | "partial" | "error" | null;
+  last_error: string | null;
+  last_row_count: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// A normalized incoming plan row (from CSV or JSON) keyed by external_id.
+export interface IncomingPlanRow {
+  external_id: string;
+  name?: string;
+  beds?: number | null;
+  baths?: number | null;
+  sqft?: number | null;
+  price?: number | null;
+  price_max?: number | null;
+  price_unit?: "unit" | "bed";
+  availability?: PlanAvailability;
+  available_text?: string | null;
 }
 
 // The "find your floor plan" questionnaire. Stored inside page_config (jsonb),
@@ -151,6 +194,24 @@ export const PAGE_TEMPLATES: { value: PageTemplate; label: string }[] = [
   { value: "coming_soon", label: "Coming soon / waitlist" },
 ];
 
+// Lead pipeline stage. Stored on leads.status (default 'uncontacted').
+export type LeadStatus =
+  | "uncontacted"
+  | "contacted"
+  | "touring"
+  | "applied"
+  | "leased"
+  | "lost";
+
+export const LEAD_STATUSES: { value: LeadStatus; label: string }[] = [
+  { value: "uncontacted", label: "Uncontacted" },
+  { value: "contacted", label: "Contacted" },
+  { value: "touring", label: "Touring" },
+  { value: "applied", label: "Applied" },
+  { value: "leased", label: "Leased" },
+  { value: "lost", label: "Lost" },
+];
+
 export interface Lead {
   id: number;
   listing_id: string;
@@ -160,6 +221,43 @@ export interface Lead {
   message: string | null;
   source: string | null;
   created_at: string;
+  // Added in 0011_lead_workflow (optional so older reads still type-check).
+  status?: LeadStatus;
+  assigned_to?: string | null;
+  contacted_at?: string | null;
+  status_updated_at?: string;
+  notes?: string | null;
+  // Added in 0013_teams.
+  escalated_at?: string | null;
+  escalated_to?: string | null;
+}
+
+// Team roles (table: portfolio_members). Layered on the single-owner model.
+export type TeamRole = "leasing_agent" | "senior_staff" | "property_manager";
+
+export const TEAM_ROLES: { value: TeamRole; label: string }[] = [
+  { value: "leasing_agent", label: "Leasing agent" },
+  { value: "senior_staff", label: "Senior staff" },
+  { value: "property_manager", label: "Property manager" },
+];
+
+export interface PortfolioMember {
+  portfolio_id: string;
+  user_id: string;
+  role: TeamRole;
+  created_at: string;
+}
+
+// Per-user lead-alert settings (table: notification_prefs). A missing row means
+// defaults: email on, sent to the user's auth email.
+export interface NotificationPrefs {
+  user_id: string;
+  email_enabled: boolean;
+  email_to: string | null;
+  sms_enabled: boolean;
+  sms_to: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Listing {

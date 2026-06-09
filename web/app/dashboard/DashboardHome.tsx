@@ -101,7 +101,7 @@ export default function DashboardHome({
       {/* Sidebar ----------------------------------------------------- */}
       <aside className="hidden md:flex flex-col gap-6 p-5 border-r border-[var(--border)] bg-white/60 backdrop-blur">
         <div className="flex items-center gap-2.5 px-1">
-          <div className="brand-gradient w-9 h-9 rounded-2xl grid place-items-center text-white shadow-sm">
+          <div className="brand-gradient w-9 h-9 rounded grid place-items-center text-white">
             <BrandMark className="w-4 h-4" />
           </div>
           <span className="font-display font-semibold text-lg tracking-tight">Nanocer</span>
@@ -129,7 +129,7 @@ export default function DashboardHome({
       {/* Main -------------------------------------------------------- */}
       <main className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl w-full mx-auto">
         <div className="flex items-center gap-3">
-          <span className="md:hidden brand-gradient w-9 h-9 rounded-2xl grid place-items-center text-white shrink-0">
+          <span className="md:hidden brand-gradient w-9 h-9 rounded grid place-items-center text-white shrink-0">
             <BrandMark className="w-4 h-4" />
           </span>
           <div className="relative flex-1 max-w-md">
@@ -145,7 +145,7 @@ export default function DashboardHome({
           <button onClick={signOut} className="md:hidden btn btn-secondary btn-sm">Sign out</button>
         </div>
 
-        <section className="brand-gradient relative overflow-hidden rounded-3xl px-6 sm:px-8 py-7 text-white shadow-[0_12px_36px_rgba(235,94,40,0.32)]">
+        <section className="brand-gradient relative overflow-hidden rounded-lg px-6 sm:px-8 py-7 text-white">
           <div aria-hidden className="absolute -right-10 -top-10 w-52 h-52 rounded-full bg-white/10" />
           <div aria-hidden className="absolute right-16 bottom-[-3rem] w-40 h-40 rounded-full bg-white/10" />
           <div className="relative max-w-lg space-y-3">
@@ -214,7 +214,7 @@ export default function DashboardHome({
 function StatCard({ label, value, icon }: { label: string; value: number; icon: string }) {
   return (
     <div className="card p-4 sm:p-5 flex items-center gap-3 sm:gap-4">
-      <div className="w-11 h-11 rounded-2xl grid place-items-center text-lg bg-orange-50 shrink-0">{icon}</div>
+      <div className="w-11 h-11 rounded grid place-items-center text-lg bg-orange-50 shrink-0">{icon}</div>
       <div className="min-w-0">
         <div className="font-display text-xl sm:text-2xl font-bold tracking-tight leading-none">{value.toLocaleString()}</div>
         <div className="text-xs text-[var(--muted)] mt-1 truncate">{label}</div>
@@ -227,7 +227,7 @@ function SidebarItem({ label, dot, count, active, onClick }: { label: string; do
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left px-3 py-2 rounded-xl text-sm flex items-center gap-2.5 transition ${
+      className={`w-full text-left px-3 py-2 rounded text-sm flex items-center gap-2.5 transition ${
         active ? "bg-orange-50 text-orange-700 font-medium" : "text-[var(--ink)] hover:bg-neutral-100"
       }`}
     >
@@ -265,7 +265,7 @@ function NewPropertyModal({
 
   return (
     <div className="fixed inset-0 bg-[#1a1924]/40 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={onClose}>
-      <div className="card p-6 w-full max-w-md space-y-4 shadow-[var(--shadow-md)]" onClick={(e) => e.stopPropagation()}>
+      <div className="card p-6 w-full max-w-md space-y-4" onClick={(e) => e.stopPropagation()}>
         <h2 className="font-semibold text-lg tracking-tight">New Property</h2>
         <label className="block">
           <span className="text-xs text-[var(--muted)]">Address / name</span>

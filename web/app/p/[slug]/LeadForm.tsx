@@ -51,7 +51,7 @@ export default function LeadForm({
 
   if (done) {
     return (
-      <div className="rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 p-4 text-sm text-center font-medium">
+      <div className="rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800 p-4 text-sm text-center font-medium">
         Thanks! The agent will reach out shortly.
       </div>
     );
@@ -104,7 +104,7 @@ export default function LeadForm({
         type="submit"
         disabled={busy}
         style={{ background: accent }}
-        className="w-full text-white rounded-xl py-3 text-sm font-semibold shadow-sm disabled:opacity-60 transition active:translate-y-px"
+        className="w-full text-white rounded py-3 text-sm font-semibold disabled:opacity-60 transition active:translate-y-px"
       >
         {busy ? busyLabel : label}
       </button>

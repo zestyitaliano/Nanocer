@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { siteUrl } from "@/lib/api";
+import { transformUrl } from "@/lib/image";
 import type {
   FloorPlan,
   Listing,
@@ -14,6 +15,8 @@ import type {
 import { PROPERTY_TYPES, PAGE_TEMPLATES } from "@/lib/types";
 import PlansEditor from "./PlansEditor";
 import QuizEditor from "./QuizEditor";
+import SyncSettings from "./SyncSettings";
+import { downloadBrochure } from "./brochure-download";
 
 function slugify(s: string): string {
   return s
@@ -59,8 +62,28 @@ export default function PageTab({
   const [comingSoon, setComingSoon] = useState(cfg0.coming_soon ?? {});
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const [brochureBusy, setBrochureBusy] = useState(false);
 
   const publicUrl = `${siteUrl().replace(/\/$/, "")}/p/${slug}`;
+
+  async function getBrochure() {
+    setBrochureBusy(true);
+    setMsg(null);
+    try {
+      await downloadBrochure({
+        listing,
+        plans,
+        photos,
+        agent,
+        themeColor: color,
+        landingUrl: enabled && slug ? publicUrl : undefined,
+      });
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : "Brochure failed.");
+    } finally {
+      setBrochureBusy(false);
+    }
+  }
 
   async function upload(file: File, single = false): Promise<string | null> {
     const path = `${userId}/${listing.id}/${Date.now()}_${file.name.replace(/[^\w.\-]/g, "_")}`;
@@ -238,16 +261,16 @@ export default function PageTab({
           {photos.map((src, i) => (
             <div key={i} className="relative">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt="" className="w-16 h-16 object-cover rounded-xl border border-[var(--border)]" />
+              <img src={transformUrl(src, { width: 128 })} alt="" loading="lazy" decoding="async" className="w-16 h-16 object-cover rounded border border-[var(--border)]" />
               <button
                 onClick={() => setPhotos((p) => p.filter((_, j) => j !== i))}
-                className="absolute -top-1.5 -right-1.5 bg-white border border-[var(--border)] shadow-sm rounded-full w-5 h-5 text-xs text-red-500 grid place-items-center"
+                className="absolute -top-1.5 -right-1.5 bg-white border border-[var(--border)] rounded-full w-5 h-5 text-xs text-red-500 grid place-items-center"
               >
                 ✕
               </button>
             </div>
           ))}
-          <label className="w-16 h-16 border border-dashed border-orange-300 bg-orange-50/50 rounded-xl flex items-center justify-center text-orange-400 text-xl cursor-pointer hover:bg-orange-50 transition">
+          <label className="w-16 h-16 border border-dashed border-orange-300 bg-orange-50/50 rounded flex items-center justify-center text-orange-400 text-xl cursor-pointer hover:bg-orange-50 transition">
             +
             <input type="file" accept="image/*" multiple onChange={addPhotos} className="hidden" />
           </label>
@@ -266,7 +289,7 @@ export default function PageTab({
           <input type="file" accept="image/*" onChange={setAgentPhoto} className="text-xs" />
           {agent.photo_url && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={agent.photo_url} alt="" className="w-8 h-8 rounded-full object-cover" />
+            <img src={transformUrl(agent.photo_url, { width: 64 })} alt="" loading="lazy" decoding="async" className="w-8 h-8 rounded-full object-cover" />
           )}
         </label>
       </div>
@@ -314,12 +337,17 @@ export default function PageTab({
           />
 
           <QuizEditor initialQuiz={cfg0.quiz ?? {}} plans={plans} onChange={setQuiz} />
+
+          <SyncSettings listingId={listing.id} userId={userId} />
         </>
       )}
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <button onClick={save} disabled={busy} className="btn btn-primary">
           {busy ? "Saving…" : "Save page"}
+        </button>
+        <button onClick={getBrochure} disabled={brochureBusy} className="btn">
+          {brochureBusy ? "Generating…" : "Download brochure (PDF)"}
         </button>
         {msg && <span className="text-sm text-[var(--muted)]">{msg}</span>}
       </div>

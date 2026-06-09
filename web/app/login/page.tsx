@@ -59,7 +59,7 @@ export default function LoginPage() {
         className="card w-full max-w-sm p-7 space-y-5"
       >
         <div className="space-y-3">
-          <div className="brand-gradient w-11 h-11 rounded-2xl grid place-items-center text-white shadow-sm">
+          <div className="brand-gradient w-11 h-11 rounded grid place-items-center text-white">
             <BrandMark className="w-5 h-5" />
           </div>
           <div>
